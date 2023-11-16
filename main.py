@@ -31,15 +31,15 @@ class John():
     char_img = pygame.image.load('images/characters/john.png')
     h_john = pygame.image.load('images/characters/h_john.png')
     clicked = False
+    health = 100
     def __init__(self, x = 500, y = 300):
         self.x = x
         self.y = y
         self.clicked = False
         self.rect = self.image.get_rect(center = (x, y))
         self.img = John.char_img
-        self.health = 100
+        self.health = John.health
         self.speed = 'normal'
-
     def show():
         if John.clicked:
             screen.blit(John.h_john, (screen_w * 2 / 7, screen_h / 2 + 20))
@@ -231,22 +231,17 @@ def play(char):
         charX += charX_change
         charY += charY_change
         screen.blit(John.char_img, (charX, charY))
-        back()
+        draw_health_bar(John.health)
     elif char == 'Tony':
         screen.blit(Tony.bg, (0, 0))
-        back_hover = False
-        mouse = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                 # sets the variable to False, which breaks the while loop
                 sys.exit()
-            # if screen_w - 200 < mouse[0] < screen_w - 200 + 510/4 and screen_h - 100 < mouse[1] < screen_h - 100 - 155/4:
-            #    back_hover = True
             movement(event)
         charX += charX_change
         charY += charY_change
         screen.blit(Tony.char_img, (charX, charY))
-        back(back_hover)
     elif char == 'Swift':
         screen.blit(Swift.bg, (0, 0))
         # Monitors events in game
@@ -258,7 +253,6 @@ def play(char):
         charX += charX_change
         charY += charY_change
         screen.blit(Swift.char_img, (charX, charY))
-        back()
     elif char == 'Quinn':
         screen.blit(Quinn.bg, (0, 0))
         # Monitors events in game
@@ -270,7 +264,6 @@ def play(char):
         charX += charX_change
         charY += charY_change
         screen.blit(Quinn.char_img, (charX, charY))
-        back()
     elif char == 'Theresa':
         screen.blit(Theresa.bg, (0, 0))
         # Monitors events in game
@@ -282,7 +275,6 @@ def play(char):
         charX += charX_change
         charY += charY_change
         screen.blit(Theresa.char_img, (charX, charY))
-        back()
     elif char == 'Jekyll':
         screen.blit(Jekyll.bg, (0, 0))
         # Monitors events in game
@@ -294,21 +286,25 @@ def play(char):
         charX += charX_change
         charY += charY_change
         screen.blit(Jekyll.char_img, (charX, charY))
-        back()
     pygame.display.update()
 
 
-def health_bar():
-    pygame.draw.rect(screen, (41, 237, 255), [20, 20, 200, 30])
+def draw_health_bar(health):
+    if health > 70:
+        color = (0, 255, 0)
+    elif health > 50:
+        color = (173, 255, 47)
+    elif health > 20:
+        color = (255, 150, 50)
+    else:
+        color = (255, 0, 0)
+    pygame.draw.rect(screen, color, (30, 30, health * 4, 30))
 
 def intro():
     screen.blit(bg, (0, 0))
 
-def home():
-    screen.blit()
-
 def detect_start_menu():
-    global game_state
+    global game_state, character
     # if the mouse is clicked in the start menu, check where the cursor is
     if game_state == 'start_menu' and event.type == pygame.MOUSEBUTTONDOWN:
         # checks which character the mouse cursor is on
@@ -390,7 +386,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
-        detect_start_menu()
+        if game_state == 'start_menu':
+            detect_start_menu()
     if game_state == 'start_menu':
         display_start()
     elif game_state == 'game_play':
