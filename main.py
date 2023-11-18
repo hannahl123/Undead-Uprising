@@ -211,10 +211,8 @@ def movement(event):
         if event.key == pygame.K_UP or event.key == pygame.K_w or event.key == pygame.K_DOWN or event.key == pygame.K_s:
             charY_change = 0
 
-# Function to play the game
-def play(char):
+def border():
     global charX, charY, charX_change, charY_change
-    # border code
     if charX <= 0:
         charX = 0
     if charX >= screen_w - 50:
@@ -223,6 +221,11 @@ def play(char):
         charY = 0
     if charY >= screen_h - 60:
         charY = screen_h - 60
+
+# Function to play the game
+def play(char):
+    global charX, charY, charX_change, charY_change
+    border()
     if char == 'John':
         screen.blit(John.bg, (0, 0))
         # Monitors events in game
@@ -311,12 +314,7 @@ def detect_start_menu():
         if screen_w * 2 / 7 <= mouse[0] <= screen_w * 2 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if John is clicked, state in the console and set the character to John
             character = "John"
-            John.clicked = True
-            Tony.clicked = False
-            Quinn.clicked = False
-            Swift.clicked = False
-            Jekyll.clicked = False
-            Theresa.clicked = False
+            John.clicked, Tony.clicked, Quinn.clicked, Swift.clicked, Jekyll.clicked, Theresa.clicked = True, False, False, False, False, False
             print('John is picked')
         elif screen_w * 2.5 / 7 <= mouse[0] <= screen_w * 2.5 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Tony is clicked, state in the console and set the character to Tony
