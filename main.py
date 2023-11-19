@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 import sys
 import ctypes
 
@@ -8,6 +9,8 @@ pygame.init()
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 screen = pygame.display.set_mode(true_res, pygame.FULLSCREEN)
 screen_w, screen_h = true_res[0], true_res[1]
+# screen = pygame.display.set_mode((200, 200))
+# screen_w, screen_h = 200, 200
 
 # Game Details - Loading and Setting the Name and Logos of the Game
 pygame.display.set_caption("Undead Uprising")
@@ -36,7 +39,6 @@ class John():
         self.x = x
         self.y = y
         self.clicked = False
-        self.rect = self.image.get_rect(center = (x, y))
         self.img = John.char_img
         self.health = John.health
         self.speed = 'normal'
@@ -145,8 +147,8 @@ class Jekyll():
         else:
             screen.blit(Jekyll.char_img, (screen_w * 4.5 / 7, screen_h / 2 + 20))
 
-
-def display_start():
+# ----------------------------------- Start menu -----------------------------------
+def startMenu():
     screen.blit(bg, (0, 0)) # displays the background
     font = pygame.font.SysFont('consolas', 25) # sets the font family and font size
     screen.blit(big_logo, ((screen_w - 800) / 2, 125)) # displays the big title
@@ -158,17 +160,14 @@ def display_start():
     buttons() # displays the start button
     pygame.display.update() # updates the screen
 
-# Displays the start button
+# Displays buttons (tutorial, start, quit, shop)
 def buttons():
-    # tutorial_b = pygame.image.load('images/Tutorial_button.png')
-    # tutorial_b = pygame.transform.scale(tutorial_b, (75, 75))
-    start_b = pygame.image.load('images/START_button.png')
-    start_b = pygame.transform.scale(start_b, (150, 60))
-    quit_b = pygame.image.load('images/QUIT_button.png')
-    quit_b = pygame.transform.scale(quit_b, (150, 60))
+    tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png'), (115, 115))
+    start_b = pygame.transform.scale(pygame.image.load('images/START_button.png'), (150, 60))
+    quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png'), (150, 60))
     screen.blit(start_b, (screen_w / 2 - 200, screen_h - 140))
     screen.blit(quit_b, (screen_w / 2 + 50, screen_h - 140))
-    # screen.blit(tutorial_b, (30, screen_h - 105))
+    screen.blit(tutorial_b, (25, screen_h - 25 - 115))
 
 # Displays all characters on the start menu
 def show_all_char():
@@ -179,11 +178,8 @@ def show_all_char():
     Theresa.show()
     Jekyll.show()
 
-def back(hover):
-    if hover:
-        screen.blit(h_back_button, (screen_w - 200, screen_h - 100))
-    else:
-        screen.blit(back_button, (screen_w - 200, screen_h - 100))
+def back():
+    screen.blit(back_button, (screen_w - 200, screen_h - 100))
 
 # Default character position - center of screen
 charX = screen_w / 2 - 30
@@ -210,6 +206,10 @@ def movement(event):
             charX_change = 0
         if event.key == pygame.K_UP or event.key == pygame.K_w or event.key == pygame.K_DOWN or event.key == pygame.K_s:
             charY_change = 0
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        # back button clicked
+        if screen_w - 50 - 510/4 <= mouse[0] <= screen_w - 50 and screen_h - 50 - 155/4 <= mouse[1] <= screen_h - 50:
+            detect_start_menu()
 
 def border():
     global charX, charY, charX_change, charY_change
@@ -224,73 +224,33 @@ def border():
 
 # Function to play the game
 def play(char):
-    global charX, charY, charX_change, charY_change
+    global charX, charY, charX_change, charY_change, game_state
+    mouse = pygame.mouse.get_pos()
     border()
-    if char == 'John':
-        screen.blit(John.bg, (0, 0))
-        # Monitors events in game
-        for event in pygame.event.get():
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(John.char_img, (charX, charY))
-        draw_health_bar(John.health)
-    elif char == 'Tony':
-        screen.blit(Tony.bg, (0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                # sets the variable to False, which breaks the while loop
-                sys.exit()
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(Tony.char_img, (charX, charY))
+    player = John()
+    if char == 'Tony':
+        player = Tony()
     elif char == 'Swift':
-        screen.blit(Swift.bg, (0, 0))
-        # Monitors events in game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                # sets the variable to False, which breaks the while loop
-                sys.exit()
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(Swift.char_img, (charX, charY))
+        player = Swift()
     elif char == 'Quinn':
-        screen.blit(Quinn.bg, (0, 0))
-        # Monitors events in game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                # sets the variable to False, which breaks the while loop
-                sys.exit()
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(Quinn.char_img, (charX, charY))
+        player = Quinn()
     elif char == 'Theresa':
-        screen.blit(Theresa.bg, (0, 0))
-        # Monitors events in game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                # sets the variable to False, which breaks the while loop
-                sys.exit()
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(Theresa.char_img, (charX, charY))
+        player = Theresa()
     elif char == 'Jekyll':
-        screen.blit(Jekyll.bg, (0, 0))
-        # Monitors events in game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                # sets the variable to False, which breaks the while loop
-                sys.exit()
-            movement(event)
-        charX += charX_change
-        charY += charY_change
-        screen.blit(Jekyll.char_img, (charX, charY))
+        player = Jekyll()
+    screen.blit(player.bg, (0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # back button clicked
+            if screen_w - 50 - 510/4 <= mouse[0] <= screen_w - 50 and screen_h - 50 - 155/4 <= mouse[1] <= screen_h - 50:
+                game_state = 'start_menu'
+        movement(event)
+    charX += charX_change
+    charY += charY_change
+    screen.blit(player.char_img, (charX, charY))
+    draw_health_bar(player.health)
+    back()
     pygame.display.update()
-
 
 def draw_health_bar(health):
     if health > 70:
@@ -314,68 +274,49 @@ def detect_start_menu():
         if screen_w * 2 / 7 <= mouse[0] <= screen_w * 2 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if John is clicked, state in the console and set the character to John
             character = "John"
-            John.clicked, Tony.clicked, Quinn.clicked, Swift.clicked, Jekyll.clicked, Theresa.clicked = True, False, False, False, False, False
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = True, False, False, False, False, False
             print('John is picked')
         elif screen_w * 2.5 / 7 <= mouse[0] <= screen_w * 2.5 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Tony is clicked, state in the console and set the character to Tony
             character = "Tony"
-            John.clicked = False
-            Tony.clicked = True
-            Quinn.clicked = False
-            Swift.clicked = False
-            Jekyll.clicked = False
-            Theresa.clicked = False
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, True, False, False, False, False
             print('Tony is picked')
         elif screen_w * 3 / 7 <= mouse[0] <= screen_w * 3 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Swift is clicked, state in the console and set the character to Swift
             character = "Swift"
-            John.clicked = False
-            Tony.clicked = False
-            Quinn.clicked = False
-            Swift.clicked = True
-            Jekyll.clicked = False
-            Theresa.clicked = False
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, True, False, False, False
             print('Swift is picked')
         elif screen_w * 3.5 / 7 <= mouse[0] <= screen_w * 3.5 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Quinn is clicked, state in the console and set the character to Quinn
             character = "Quinn"
-            John.clicked = False
-            Tony.clicked = False
-            Quinn.clicked = True
-            Swift.clicked = False
-            Jekyll.clicked = False
-            Theresa.clicked = False
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, True, False, False
             print('Quinn is picked')
         elif screen_w * 4 / 7 <= mouse[0] <= screen_w * 4 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Theresa is clicked, state in the console and set the character to Theresa
             character = "Theresa"
-            John.clicked = False
-            Tony.clicked = False
-            Quinn.clicked = False
-            Swift.clicked = False
-            Jekyll.clicked = False
-            Theresa.clicked = True
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, False, True, False
             print('Theresa is picked')
         elif screen_w * 4.5 / 7 <= mouse[0] <= screen_w * 4.5 / 7 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             # if Jekyll is clicked, state in the console and set the character to Jekyll
             character = "Jekyll"
-            John.clicked = False
-            Tony.clicked = False
-            Quinn.clicked = False
-            Swift.clicked = False
-            Jekyll.clicked = True
-            Theresa.clicked = False
+            John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, False, False, True
             print('Jekyll is picked')
         # checks if the start button is clicked
         elif screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
             # if the start button was pressed, set the game state to game_play, which executes the next part of the game
             game_state = "game_play"
+        # if quit button clicked
+        elif screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
+            sys.exit()
         # checks if the tutorial button is clicked
         if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
             game_state = "tutorial"
 
 # Variable to keep the game on, when changed to False then exit
 running = True
+time = 0
+fps = 60
+clock = pygame.time.Clock()
 
 # Main Loop of Game
 while running:
@@ -387,8 +328,14 @@ while running:
         if game_state == 'start_menu':
             detect_start_menu()
     if game_state == 'start_menu':
-        display_start()
+        startMenu()
     elif game_state == 'game_play':
         play(character)
     elif game_state == 'tutorial':
         intro()
+    pygame.display.update()
+    clock.tick(60)
+    # time += 1/60
+    # print(time)
+
+
