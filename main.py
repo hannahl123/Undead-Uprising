@@ -187,6 +187,8 @@ charY = screen_h / 2 - 30
 charX_change = 0
 charY_change = 0
 
+speed = 4
+
 def movement(event):
     global charX, charY, charX_change, charY_change, mouse
     if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
@@ -194,13 +196,13 @@ def movement(event):
         sys.exit()
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            charX_change = -3
+            charX_change = -speed
         if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            charX_change = 3
+            charX_change = speed
         if event.key == pygame.K_UP or event.key == pygame.K_w:
-            charY_change = -3
+            charY_change = -speed
         if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            charY_change = 3
+            charY_change = speed
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_LEFT or event.key == pygame.K_a or event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             charX_change = 0
@@ -221,6 +223,7 @@ def border():
         charY = 0
     if charY >= screen_h - 60:
         charY = screen_h - 60
+
 
 # Function to play the game
 def play(char):
@@ -335,7 +338,3 @@ while running:
         intro()
     pygame.display.update()
     clock.tick(60)
-    # time += 1/60
-    # print(time)
-
-
