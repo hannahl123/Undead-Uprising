@@ -1,12 +1,12 @@
 # All code for Undead Uprising
-# Lines 1 - 25 Basic Setup of Game Screen Settings
+# Lines 1 - 25 Basic Setup of Game Screen Settings (libraries, init, size)
 # Lines 26 - 169 Character Classes (attributes, functions, etc.)
 # Lines 170 - 211 Zombie Classes and Generating
 # Lines 212 - 287 Start Menu
-# Lines 288 - 390 Game Play FUnctions (movement detection, border, health bar, back button, etc.)
-# Lines 391 - 395 Tutorial
-# Lines 396 - 406 Game Settings (logo, title, character, state)
-# Lines 407 - End Main Loop of Game (while loop, time, fps, etc.)
+# Lines 288 - 383 Game Play Functions (movement detection, border, health bar, back button, etc.)
+# Lines 384 - 388 Tutorial
+# Lines 389 - 399 Game Settings (logo, title, character, state)
+# Lines 400 - End Main Loop of Game (while loop, time, fps, etc.)
 
 import pygame
 from pygame.locals import *
@@ -22,6 +22,9 @@ pygame.init()
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 screen = pygame.display.set_mode(true_res, pygame.FULLSCREEN)
 screen_w, screen_h = true_res[0], true_res[1]
+fps = 60
+clock = pygame.time.Clock()
+time = 0
 
 # ---------------------------------------- Characters ----------------------------------------
 class John():
@@ -342,10 +345,9 @@ def border():
 
 # Displays health bar
 def draw_health_bar(health):
-    bar_100 = pygame.transform.scale(pygame.image.load('images/health_bar/bar_100.png'), (400, 30))
-    bar_90 = pygame.transform.scale(pygame.image.load('images/health_bar/bar_90.png'), (400, 30))
-    bar_80 = pygame.transform.scale(pygame.image.load('images/health_bar/bar_80.png'), (400, 30))
-    bar_70 = pygame.transform.scale(pygame.image.load('images/health_bar/bar_70.png'), (400, 30))
+    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (400, 30))
+    font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
+    text = font.render(str(int(health)), True, (0, 0, 0))
     if health > 70:
         color = (0, 255, 0)
     elif health > 50:
@@ -354,14 +356,16 @@ def draw_health_bar(health):
         color = (255, 150, 50)
     else:
         color = (255, 0, 0)
-    pygame.draw.rect(screen, color, (30, 30, health * 4, 30))
+    pygame.draw.rect(screen, color, (70, 30, health * 4, 30))
+    screen.blit(border, (70, 30))
+    screen.blit(text, (25, 33))
 
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
 h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
 
 # Game Play Function
-def play():
+def play(collides):
     global player, charX, charY, charX_change, charY_change, game_state, randX, randY, clock
     border()
     screen.blit(player.bg, (0, 0))
@@ -373,20 +377,30 @@ def play():
     all_sprites.draw(screen)
     collide = pygame.Rect.colliderect(player.rect, test.rect)
     if collide:
-        player.health -= 1
+        collides += 1
+        if collides > 60:
+            collide = False
+        else:
+            player.health -= 1
         print('collided')
+    if player.health == 0:
+        game_state = 'game_over'
     screen.blit(test.zombie_full_health, (test.x, test.y))
     screen.blit(player.player_img, (charX, charY))
     draw_health_bar(player.health)
     screen.blit(back_button, (screen_w - 510/4 - 30, screen_h - 155/4 - 30))
     pygame.display.update()
 
+def game_over():
+    screen.blit(logo, (0, 0))
+
+
 # ----------------------------------- Tutorial -----------------------------------
 
 def tutorial():
     screen.blit(logo, (0, 0))
 
-# ---------------------------------------- Game Details ----------------------------------------
+# ----------------------------------- Game Details -----------------------------------
 
 # Setting the game name and logo
 pygame.display.set_caption("Undead Uprising")
@@ -401,9 +415,7 @@ character = "John" # default character
 
 # Keeps track of game time
 running = True
-time = 0
-fps = 60
-clock = pygame.time.Clock()
+collides = 0
 
 while running:
     screen.fill((255, 255, 255))
@@ -418,11 +430,13 @@ while running:
     if game_state == 'start_menu':
         startMenu()
     elif game_state == 'game_play':
-        play()
+        collides = 0
+        play(collides)
+    elif game_state == 'game_over':
+        game_over()
     elif game_state == 'tutorial':
         tutorial()
     pygame.display.update()
     clock.tick(fps)
-    time += (pygame.time.get_ticks() / 1000)
 
 print(time)
