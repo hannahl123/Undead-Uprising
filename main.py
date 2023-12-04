@@ -347,11 +347,11 @@ def shop():
     screen.blit(jekyll, (175, 450))
     screen.blit(jekyll_def, (275, 455))
     screen.blit(heal, (screen_w / 2 + 50, 250))
-    screen.blit(heal_def, (screen_w / 2, 255))
+    screen.blit(heal_def, (screen_w / 2 + 150, 255))
     screen.blit(shield, (screen_w / 2 + 50, 350))
-    screen.blit(shield_def, (screen_w / 2, 355))
+    screen.blit(shield_def, (screen_w / 2 + 150, 355))
     screen.blit(damage, (screen_w / 2 + 50, 450))
-    screen.blit(dmg_def, (screen_w / 2, 455))
+    screen.blit(dmg_def, (screen_w / 2 + 150, 455))
     
 
 # ----------------------------------- Game Play -----------------------------------
