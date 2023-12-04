@@ -195,6 +195,7 @@ class normalZombie:
         else:
             screen.blit(logo, (normalZombie.x, normalZombie.y))
 
+
 def generate():
     randNum = random.randint(0, 3)
     if randNum == 0: # appear from top border
@@ -338,18 +339,18 @@ def shop():
     screen.blit(shop_title, ((screen_w - 685/3.5) / 2, 50))
     screen.blit(shop_bg, (screen_w * 0.1, 150))
     screen.blit(title1, (300, 185))
-    screen.blit(title2, (675, 185))
+    screen.blit(title2, (800, 185))
     screen.blit(quinn, (175, 250))
     screen.blit(quinn_def, (275, 255))
     screen.blit(theresa, (175, 350))
     screen.blit(theresa_def, (275, 355))
     screen.blit(jekyll, (175, 450))
     screen.blit(jekyll_def, (275, 455))
-    screen.blit(heal, (screen_w / 2 - 100, 250))
+    screen.blit(heal, (screen_w / 2 + 50, 250))
     screen.blit(heal_def, (screen_w / 2, 255))
-    screen.blit(shield, (screen_w / 2 - 100, 350))
+    screen.blit(shield, (screen_w / 2 + 50, 350))
     screen.blit(shield_def, (screen_w / 2, 355))
-    screen.blit(damage, (screen_w / 2 - 100, 450))
+    screen.blit(damage, (screen_w / 2 + 50, 450))
     screen.blit(dmg_def, (screen_w / 2, 455))
     
 
@@ -423,8 +424,8 @@ def draw_health_bar(health):
         color = (255, 150, 50)
     else:
         color = (255, 0, 0)
-    pygame.draw.rect(screen, color, (80, 30, health * 4, 30))
-    screen.blit(border, (80, 30))
+    pygame.draw.rect(screen, color, (85, 30, health * 4, 30))
+    screen.blit(border, (85, 30))
     screen.blit(text, (25, 33))
 
 # Back button images
