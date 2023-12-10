@@ -1,115 +1,195 @@
-# Testing health bar and sprites
-
-import pygame
-import random
-import sys
-from pygame.locals import *
-
+import pygame,sys
+  
+  
+#Color definitions
+BLUE = (10,10,128)
+RED = (255,0,0)
+BLACK = (0,0,0)
+#Screen width
+  
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+  
+  
 pygame.init()
-
-WIDTH, HEIGHT = 800, 600
-FPS = 60
-
-GREEN = (0, 255, 0)
-YELLOW_GREEN = (173, 255, 47)
-YELLOW_RED = (255, 150, 50)
-RED = (255, 0, 0)
-
-player_health = 100
-damage_value = 10 #for the space bar test, can change this to any sort of damage thing
-
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Health Bar Game")
-clock = pygame.time.Clock()
-font = pygame.font.Font(None, 30)
-
-# GLOBAL VARIABLES 
-COLOR = (255, 100, 98) 
-SURFACE_COLOR = (167, 255, 100) 
-WIDTH = 500
-HEIGHT = 500
-
-class Char(pygame.sprite.Sprite):
-    char_img = pygame.image.load('images/characters/john.png')
-    def __init__(self, color, height, width): 
-        super().__init__() 
-        self.image = pygame.Surface([width, height]) 
-        self.image.fill(SURFACE_COLOR) 
-        self.image.set_colorkey(COLOR) 
-        pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height)) 
+  
+  
+  
+  
+class Player(pygame.sprite.Sprite):
+    def __init__(self,x,y):
+        super().__init__()
+        self.image = pygame.Surface([50,45])
+        self.image.fill(BLUE)
         self.rect = self.image.get_rect()
-    
-    def moveRight(self, pixels):
-        self.rect.x += pixels
- 
-    def moveLeft(self, pixels):
-        self.rect.x -= pixels
- 
-    def moveForward(self, speed):
-        self.rect.y += speed * speed / 10
- 
-    def moveBack(self, speed):
-        self.rect.y -= speed * speed / 10
-
-all_sprites_list = pygame.sprite.Group() 
-gravity = 4
-
-object_ = Char(RED, 30, 30)
-object_.rect.x = 200
-object_.rect.y = 300
-
-all_sprites_list.add(object_) 
-
-zombie_img = pygame.image.load('images/test_char.png')
-zomb = Rect(200, 50, 50, 50)
-
-def draw_health_bar(health):
-    if health > 70:
-        color = GREEN
-    elif health > 50:
-        color = YELLOW_GREEN
-    elif health > 20:
-        color = YELLOW_RED
-    else:
-        color = RED
-    pygame.draw.rect(screen, color, (0, 0, health * 1.5, 20))
-
-def main():
-    global player_health
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player_health -= damage_value
-            #    if player_health <= 0:
-            #        sys.exit() #health becomes zero or lower, pygame ends the run
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            object_.moveLeft(5)
-        if keys[pygame.K_RIGHT]:
-            object_.moveRight(5)
-        if keys[pygame.K_DOWN]:
-            object_.moveForward(5)
-        if keys[pygame.K_UP]:
-            object_.moveBack(5)
-        screen.fill((255, 255, 255))
-        draw_health_bar(player_health)
-        health_text = font.render(f"Health: {player_health}", True, (0, 0, 0))
-        screen.blit(health_text, (0, 0))
-        all_sprites_list.update() 
-        all_sprites_list.draw(screen)
-        collide = pygame.Rect.colliderect(object_.rect, zomb)
-        if collide:
-            print('collided')
-        pygame.draw.rect(screen, (0, 0, 255), zomb)
-        pygame.display.flip()
-        clock.tick(FPS) #screen stuff
-
-if __name__ == "__main__":
-    main()
-
+        self.rect.y = y
+        self.rect.x = x
+        self.score = 0
+  
+        self.change_x = 0
+        self.change_y = 0
+        self.walls = None
+  
+    def changespeed(self,x,y):
+        self.change_x += x
+        self.change_y += y
+  
+    def update(self):
+        self.rect.x += self.change_x
+  
+        block_hit_list = pygame.sprite.spritecollide(self,self.walls, False)
+        for block in block_hit_list:
+            if self.change_x > 0:
+                self.rect.right = block.rect.left
+            else:
+                self.rect.left = block.rect.right
+  
+        self.rect.y += self.change_y
+  
+        block_hit_list = pygame.sprite.spritecollide(self,self.walls, False)
+        for block in block_hit_list:
+  
+            if self.change_y > 0:
+                self.rect.bottom = block.rect.top
+            else:
+                self.rect.top = block.rect.bottom
+  
+  
+class Player2(pygame.sprite.Sprite):
+    def __init__(self,x,y,human):
+        super().__init__()
+        self.human = human
+        self.image = pygame.Surface([50,45])
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+        self.score = 0
+  
+        self.rect.x = 400
+        self.rect.y = 40
+  
+        self.change_x = 0
+        self.change_y = 0
+        self.walls = None
+  
+    def changespeed(self,x,y):
+        self.change_x += x
+        self.change_y += y
+  
+    def update(self):
+        if self.human.rect.x > self.rect.x :
+            self.rect.x += 1
+        if self.human.rect.x < self.rect.x :
+            self.rect.x -= 1
+        if self.human.rect.y > self.rect.y :
+            self.rect.y += 1
+        if self.human.rect.y < self.rect.y :
+            self.rect.y -= 1
+  
+  
+  
+  
+  
+class Wall(pygame.sprite.Sprite):
+    def __init__(self,x,y,width,height):
+        super().__init__()
+  
+        self.image = pygame.Surface([width, height])
+        self.image.fill(BLUE)
+  
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+  
+  
+  
+#Wall init
+  
+wall_list = pygame.sprite.Group()
+  
+#Pygame definitions
+  
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+pygame.display.set_caption('test!')
+all_sprite_list = pygame.sprite.Group()
+  
+  
+  
+  
+  
+#Left wall
+wall = Wall(0,0,10,600)
+wall_list.add(wall)
+all_sprite_list.add(wall)
+#top wall
+wall = Wall(10,0,790,10)
+wall_list.add(wall)
+all_sprite_list.add(wall)
+  
+#Right wall
+wall = Wall (790,0,10,600)
+wall_list.add(wall)
+all_sprite_list.add(wall)
+  
+#Bottom wall
+wall = Wall (0,590,1000,300)
+wall_list.add(wall)
+all_sprite_list.add(wall)
+  
+  
+#Create the player
+player = Player(50,50)
+all_sprite_list.add(player)
+player.walls = wall_list
+  
+player2 = Player2(50,50, player)
+all_sprite_list.add(player2)
+player2.walls = wall_list
+  
+  
+clock = pygame.time.Clock()
+  
+#Loop
+  
+done = False
+  
+while not done:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+  
+  
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a:
+                player.changespeed(-3, 0)
+            elif event.key == pygame.K_d:
+                player.changespeed(3,0)
+            elif event.key == pygame.K_w:
+                player.changespeed(0,-3)
+            elif event.key == pygame.K_s:
+                player.changespeed(0,3)
+  
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_a:
+                player.changespeed(3,0)
+            elif event.key == pygame.K_d:
+                player.changespeed(-3,0)
+            elif event.key == pygame.K_w:
+                player.changespeed(0,3)
+            elif event.key == pygame.K_s:
+                player.changespeed(0,-3)
+  
+  
+    all_sprite_list.update()
+    screen.fill(BLACK)
+    all_sprite_list.draw(screen)
+    pygame.display.flip()
+    clock.tick(60)
+    pygame.display.flip()
+  
+  
+  
+  
+  
+pygame.quit()

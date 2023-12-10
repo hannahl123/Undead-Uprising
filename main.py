@@ -20,8 +20,9 @@ pygame.init()
 
 # Setting size of screen to full screen
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
-screen = pygame.display.set_mode(true_res, pygame.FULLSCREEN)
 screen_w, screen_h = true_res[0], true_res[1]
+screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
+font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
 fps = 60
 clock = pygame.time.Clock()
 time = 0
@@ -33,6 +34,7 @@ class John():
     player_img = pygame.image.load('images/characters/player_john.png')
     h_john = pygame.image.load('images/characters/h_john.png')
     clicked = False
+    orig_health = 100
 
     def __init__(self):
         self.clicked = False
@@ -55,6 +57,7 @@ class Tony():
     player_img = pygame.image.load('images/characters/player_tony.png')
     h_tony = pygame.image.load('images/characters/h_tony.png')
     clicked = False
+    orig_health = 100
 
     def __init__(self):
         self.clicked = False
@@ -77,6 +80,7 @@ class Swift():
     player_img = pygame.image.load('images/characters/player_swift.png')
     h_swift = pygame.image.load('images/characters/h_swift.png')
     clicked = False
+    orig_health = 100
 
     def __init__(self):
         self.clicked = False
@@ -99,6 +103,7 @@ class Quinn():
     player_img = pygame.image.load('images/characters/player_quinn.png')
     h_quinn = pygame.image.load('images/characters/h_quinn.png')
     clicked = False
+    orig_health = 120
 
     def __init__(self):
         self.clicked = False
@@ -124,7 +129,7 @@ class Theresa():
     player_img = pygame.image.load('images/characters/player_theresa.png')
     h_theresa = pygame.image.load('images/characters/h_theresa.png')
     clicked = False
-    health = 120
+    orig_health = 120
 
     def __init__(self):
         self.clicked = False
@@ -150,7 +155,7 @@ class Jekyll():
     player_img = pygame.image.load('images/characters/player_jekyll.png')
     h_jekyll = pygame.image.load('images/characters/h_jekyll.png')
     clicked = False
-    health = 120
+    orig_health = 120
 
     def __init__(self):
         self.clicked = False
@@ -178,6 +183,8 @@ class normalZombie:
     zombie_full_health = pygame.image.load('images/zombies/norm_zombie_full_health.png')
     zombie_half_health = pygame.image.load('images/zombies/norm_zombie_half_health.png')
     health = 2
+    x = 100
+    y = 100
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -194,21 +201,26 @@ class normalZombie:
             screen.blit(normalZombie.zombie_half_health, (normalZombie.x, normalZombie.y))
         else:
             screen.blit(logo, (normalZombie.x, normalZombie.y))
-
+    
+    def move(self, charX, charY, zombieX, zombieY):
+        dx, dy = charX - zombieX, charY - zombieY
+        stepx, stepy = dx / fps, dy / fps
+        normalZombie.x -= stepx
+        normalZombie.y -= stepy
 
 def generate():
     randNum = random.randint(0, 3)
     if randNum == 0: # appear from top border
-        randX, randY = random.randint(0, screen_w - 35), 0
+        randX, randY = random.randint(0, screen_w - 35), 100
     elif randNum == 1: # appear from right border
-        randX, randY = screen_w - 35, random.randint(0, screen_h - 60)
+        randX, randY = screen_w - 35, random.randint(100, screen_h - 60)
     elif randNum == 2: # appear from bottom border
         randX, randY = random.randint(0, screen_w - 35), screen_h - 60
     else: # appear from left border
-        randX, randY = screen_w - 35, random.randint(0, screen_h - 60)
+        randX, randY = screen_w - 35, random.randint(100, screen_h - 60)
     zombie = normalZombie(randX, randY)
-    zombie.rect.x = zombie.x - 12
-    zombie.rect.y = zombie.y - 12
+    zombie.rect.x = zombie.x
+    zombie.rect.y = zombie.y
     return zombie
 
 test = generate()
@@ -219,7 +231,6 @@ def startMenu():
     # Images and Text
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
     title_img = pygame.image.load('images/UNDEAD UPRISING.png')
-    font = pygame.font.SysFont('consolas', 25) # sets the font family and font size
     text = font.render('Pick your character', True, (255, 255, 255))
     border = pygame.transform.scale(pygame.image.load('images/border.png'), (700, 200))
     tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png'), (115, 115))
@@ -313,6 +324,17 @@ def detect_start_menu():
 
 # ----------------------------------- Shop -----------------------------------
 
+points = 1500
+
+shop_items = {
+    "quinn" : False, 
+    "theresa" : False, 
+    "jekyll" : False,
+    "heal" : 0,
+    "shield" : 0,
+    "dmg" : 0
+}
+
 def shop():
     # Images, text, etc.
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
@@ -333,6 +355,8 @@ def shop():
     shield_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
     damage = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (75, 75))
     dmg_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4.5, 155/4.5))
+    buy_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4.5, 155/4.5))
 
     # Display images and text
     screen.blit(darken, (0, 0))
@@ -352,9 +376,60 @@ def shop():
     screen.blit(shield_def, (screen_w / 2 + 150, 355))
     screen.blit(damage, (screen_w / 2 + 50, 450))
     screen.blit(dmg_def, (screen_w / 2 + 150, 455))
+    screen.blit(buy_button, (500, screen_h - 150))
+    screen.blit(back_button, (screen_w - 600, screen_h - 150))
     
 
 # ----------------------------------- Game Play -----------------------------------
+
+# Top bar
+def bar(health, orig_health):
+    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, screen_w, 80))
+    draw_health_bar(health, orig_health)
+    power_ups()
+
+# Displays health bar
+def draw_health_bar(health, orig_health):
+    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (400, 30))
+    font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
+    text = font.render(str(int(health)), True, (255, 255, 255))
+    if health > 70:
+        color = (0, 255, 0)
+    elif health > 50:
+        color = (173, 255, 47)
+    elif health > 20:
+        color = (255, 150, 50)
+    else:
+        color = (255, 0, 0)
+    pygame.draw.rect(screen, color, (85, 25, (health / orig_health) * 400, 30))
+    screen.blit(border, (85, 25))
+    screen.blit(text, (25, 30))
+
+# Displays power-ups
+def power_ups():
+    grey_heal = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
+    grey_shield = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
+    grey_damage = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
+    heal = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (50, 50))
+    shield = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (50, 50))
+    damage = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (50, 50))
+    items = font.render('Items', True, (255, 255, 255))
+    screen.blit(items, (screen_w - 300 - items.get_width(), 30))
+
+    if shop_items['heal'] == 1:
+        screen.blit(heal, (screen_w - 250, 15))
+    else:
+        screen.blit(grey_heal, (screen_w - 250, 15))
+    
+    if shop_items['shield'] == 1:
+        screen.blit(shield, (screen_w - 175, 15))
+    else:
+        screen.blit(grey_shield, (screen_w - 175, 15))
+    
+    if shop_items['dmg'] == 1:
+        screen.blit(damage, (screen_w - 100, 15))
+    else:
+        screen.blit(grey_damage, (screen_w - 100, 15))
 
 # Default character settings - player, position, speed
 player = John()
@@ -362,7 +437,7 @@ charX = screen_w / 2 - 18
 charY = screen_h / 2 - 28
 charX_change = 0
 charY_change = 0
-speed = 4
+speed = 5
 
 # Detects events during game play state
 def movement():
@@ -411,39 +486,32 @@ def border():
     if charY >= screen_h - 60:
         charY = screen_h - 60
 
-# Displays health bar
-def draw_health_bar(health):
-    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (400, 30))
-    font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
-    text = font.render(str(int(health)), True, (0, 0, 0))
-    if health > 70:
-        color = (0, 255, 0)
-    elif health > 50:
-        color = (173, 255, 47)
-    elif health > 20:
-        color = (255, 150, 50)
-    else:
-        color = (255, 0, 0)
-    pygame.draw.rect(screen, color, (85, 30, health * 4, 30))
-    screen.blit(border, (85, 30))
-    screen.blit(text, (25, 33))
-
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
 h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
 
 # Game Play Function
 def play(collides, shop_display):
-    global player, charX, charY, charX_change, charY_change, game_state, randX, randY, clock
+    global player, charX, charY, charX_change, charY_change, game_state, clock    
     border()
-    screen.blit(player.bg, (0, 0))
+    # Basic screen set-up
+    screen.blit(player.bg, (0, 80))
+    screen.blit(test.zombie_full_health, (test.x, test.y))
+    screen.blit(player.player_img, (charX, charY))
+    bar(player.health, player.orig_health)
+    screen.blit(back_button, (screen_w - 510/4 - 30, screen_h - 155/4 - 30))
+
+    # Character movement changes
     charX += charX_change
     charY += charY_change
     player.rect.x = charX
     player.rect.y = charY
     all_sprites.update() 
     all_sprites.draw(screen)
+    
+    # Detect collision between character and zombie
     collide = pygame.Rect.colliderect(player.rect, test.rect)
+    
     if collide:
         collides += 1
         if collides > 60:
@@ -451,18 +519,26 @@ def play(collides, shop_display):
         else:
             player.health -= 1
         print('collided')
+    
+    # Game end
     if player.health == 0:
         game_state = 'game_over'
-    screen.blit(test.zombie_full_health, (test.x, test.y))
-    screen.blit(player.player_img, (charX, charY))
-    draw_health_bar(player.health)
-    screen.blit(back_button, (screen_w - 510/4 - 30, screen_h - 155/4 - 30))
+    
+    # Display shop screen
     if shop_display:
         shop()
-    pygame.display.update()
+    test.move(charX, charY, test.x, test.y)
 
 def game_over():
-    screen.blit(logo, (0, 0))
+    # Images
+    game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png"), (screen_w, screen_h))
+    try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png"), (1000/3, 150/3))
+    quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png"), (250*0.9, 100*0.9))
+
+    # Display images
+    screen.blit(game_over_screen, (0, 0))
+    screen.blit(try_again, (200, screen_h - 150))
+    screen.blit(quit, (screen_w - 500, screen_h - 175))
 
 # ----------------------------------- Tutorial -----------------------------------
 
