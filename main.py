@@ -1,12 +1,13 @@
 # All code for Undead Uprising
-# Lines 1 - 25 Basic Setup of Game Screen Settings (libraries, init, size)
-# Lines 26 - 169 Character Classes (attributes, functions, etc.)
-# Lines 170 - 211 Zombie Classes and Generating
-# Lines 212 - 287 Start Menu
-# Lines 288 - 383 Game Play Functions (movement detection, border, health bar, back button, etc.)
-# Lines 384 - 388 Tutorial
-# Lines 389 - 399 Game Settings (logo, title, character, state)
-# Lines 400 - End Main Loop of Game (while loop, time, fps, etc.)
+# Lines 1 - 30 Basic Setup of Game Screen Settings (libraries, init, size)
+# Lines 31 - 187 Character Classes (attributes, functions, etc.)
+# Lines 188 - 236 Zombie Classes and Generating
+# Lines 237 - 334 Start Menu
+# Lines 335 - 446 Shop
+# Lines 446 - 611 Game Play Functions (movement detection, border, health bar, back button, etc.)
+# Lines 612 - 616 Tutorial
+# Lines 617 - 627 Game Details (logo, title, character, state)
+# Lines 628 - 658 Main Loop of Game (while loop, time, fps, etc.)
 
 import pygame
 from pygame.locals import *
@@ -80,7 +81,7 @@ class Swift():
     player_img = pygame.image.load('images/characters/player_swift.png')
     h_swift = pygame.image.load('images/characters/h_swift.png')
     clicked = False
-    orig_health = 100
+    orig_health = 75
 
     def __init__(self):
         self.clicked = False
@@ -102,6 +103,7 @@ class Quinn():
     char_img = pygame.image.load('images/characters/quinn.png')
     player_img = pygame.image.load('images/characters/player_quinn.png')
     h_quinn = pygame.image.load('images/characters/h_quinn.png')
+    grey_quinn = pygame.image.load('images/characters/grey_quinn.png')
     clicked = False
     orig_health = 120
 
@@ -115,10 +117,12 @@ class Quinn():
         self.speed = 'normal'
 
     def show():
-        if Quinn.clicked:
+        if Quinn.clicked and shop_items["quinn"] == True:
             screen.blit(Quinn.h_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
         else:
             screen.blit(Quinn.char_img, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
+        if shop_items["quinn"] == False:
+            screen.blit(Quinn.grey_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
 
     def special():
         screen.blit(logo, (0, 0))
@@ -128,6 +132,7 @@ class Theresa():
     char_img = pygame.image.load('images/characters/theresa.png')
     player_img = pygame.image.load('images/characters/player_theresa.png')
     h_theresa = pygame.image.load('images/characters/h_theresa.png')
+    grey_theresa = pygame.image.load('images/characters/grey_theresa.png')
     clicked = False
     orig_health = 120
 
@@ -141,10 +146,12 @@ class Theresa():
         self.speed = 'normal'
 
     def show():
-        if Theresa.clicked:
+        if Theresa.clicked and shop_items["theresa"] == True:
             screen.blit(Theresa.h_theresa, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
         else:
             screen.blit(Theresa.char_img, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
+        if shop_items["theresa"] == False:
+            screen.blit(Theresa.grey_theresa, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
 
     def special():
         screen.blit(logo, (0, 0))
@@ -154,6 +161,7 @@ class Jekyll():
     char_img = pygame.image.load('images/characters/jekyll.png')
     player_img = pygame.image.load('images/characters/player_jekyll.png')
     h_jekyll = pygame.image.load('images/characters/h_jekyll.png')
+    grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png')
     clicked = False
     orig_health = 120
 
@@ -167,10 +175,12 @@ class Jekyll():
         self.speed = 'fast'
 
     def show():
-        if Jekyll.clicked:
+        if Jekyll.clicked and shop_items["jekyll"] == True:
             screen.blit(Jekyll.h_jekyll, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
         else:
             screen.blit(Jekyll.char_img, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
+        if shop_items["jekyll"] == False:
+            screen.blit(Jekyll.grey_jekyll, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
 
     def special():
         screen.blit(logo, (0, 0))
@@ -260,7 +270,7 @@ def detect_start_menu():
 
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_z:
-            shop()
+            shop(mouse)
 
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -287,21 +297,22 @@ def detect_start_menu():
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, True, False, False, False
             print('Swift is picked')
-        elif screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+        # Special characters
+        elif shop_items["quinn"] == True and screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Quinn()
             if Quinn.clicked:
                 Quinn.clicked = not Quinn.clicked
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, True, False, False
             print('Quinn is picked')
-        elif screen_w * (0.28 + 4 * 0.077) <= mouse[0] <= screen_w * (0.28 + 4 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+        elif shop_items["theresa"] == True and screen_w * (0.28 + 4 * 0.077) <= mouse[0] <= screen_w * (0.28 + 4 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Theresa()
             if Theresa.clicked:
                 Theresa.clicked = not Theresa.clicked
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, False, True, False
             print('Theresa is picked')
-        elif screen_w * (0.28 + 5 * 0.077) <= mouse[0] <= screen_w * (0.28 + 5 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+        elif shop_items["jekyll"] == True and screen_w * (0.28 + 5 * 0.077) <= mouse[0] <= screen_w * (0.28 + 5 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Jekyll()
             if Jekyll.clicked:
                 Jekyll.clicked = not Jekyll.clicked
@@ -324,18 +335,22 @@ def detect_start_menu():
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 1500
+points = 0
 
 shop_items = {
     "quinn" : False, 
     "theresa" : False, 
     "jekyll" : False,
-    "heal" : 0,
-    "shield" : 0,
-    "dmg" : 0
+    "med_kit" : False,
+    "speed_potion" : False,
+    "bomb" : False
 }
 
-def shop():
+selected = ""
+
+def shop(mouse):
+    global selected, shop_display
+
     # Images, text, etc.
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
     title1 = font.render('CHARACTERS', True, (0, 0, 0))
@@ -343,20 +358,33 @@ def shop():
     darken = pygame.transform.scale(pygame.image.load("images/darken.png"), (screen_w, screen_h))
     shop_title = pygame.transform.scale(pygame.image.load("images/SHOP_title.png"), (685/3.5, 200/3.5))
     shop_bg = pygame.transform.scale(pygame.image.load("images/shop_bg.png"), (screen_w * 0.8, screen_h * 0.7))
-    quinn = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (75, 75))
-    quinn_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (75, 75))
-    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png"), (75, 75))
-    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    heal = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (75, 75))
-    heal_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    shield = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (75, 75))
-    shield_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    damage = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (75, 75))
-    dmg_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
     back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4.5, 155/4.5))
-    buy_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4.5, 155/4.5))
+    buy_button = pygame.transform.scale(pygame.image.load("images/BUY_button.png"), (818/8.7, 300/8.7))
+
+    # Character images and definitions
+    quinn = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (80, 80))
+    normal_quinn = pygame.transform.scale(pygame.image.load("images/characters/normal_quinn.png"), (80, 80))
+    quinn_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (80, 80))
+    normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png"), (80, 80))
+    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png"), (80, 80))
+    normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png"), (80, 80))
+    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    
+    # Power-up images and definitions
+    normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png"), (80, 80))
+    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png"), (80, 80))
+    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png"), (80, 80))
+    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png"), (80, 80))
+    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    normal_bomb = pygame.transform.scale(pygame.image.load("images/power-ups/normal_bomb.png"), (80, 80))
+    bomb = pygame.transform.scale(pygame.image.load("images/power-ups/circled_bomb.png"), (80, 80))
+    bomb_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    
+    # Sign
+    sign = pygame.image.load("images/test_char.png")
 
     # Display images and text
     screen.blit(darken, (0, 0))
@@ -364,21 +392,63 @@ def shop():
     screen.blit(shop_bg, (screen_w * 0.1, 150))
     screen.blit(title1, (300, 185))
     screen.blit(title2, (800, 185))
-    screen.blit(quinn, (175, 250))
+    screen.blit(normal_theresa, (175, 350))
+    screen.blit(normal_quinn, (175, 250))
+    screen.blit(normal_jekyll, (175, 450))
+    screen.blit(normal_med_kit, (screen_w / 2 + 50, 250))
+    screen.blit(normal_speed_potion, (screen_w / 2 + 50, 350))
+    screen.blit(normal_bomb, (screen_w / 2 + 50, 450))
+
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if shop_items["quinn"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
+            if points <= 1500:
+                screen.blit(sign, (screen_w / 2 - sign.get_width() / 2, screen_h / 2 - sign.get_height() / 2))
+            else:
+                screen.blit(quinn, (175, 250))
+                selected = "quinn"
+        elif shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
+            screen.blit(theresa, (175, 350))
+            selected = "theresa" 
+        elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
+            screen.blit(jekyll, (175, 450))
+            selected = "jekyll"
+        elif shop_items["med_kit"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 250 <= mouse[1] <= 300:
+            screen.blit(med_kit, (screen_w / 2 + 50, 250))
+            selected = "med_kit"
+        elif shop_items["speed_potion"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 350 <= mouse[1] <= 400:
+            screen.blit(speed_potion, (screen_w / 2 + 50, 350))
+            selected = "speed_potion"
+        elif shop_items["bomb"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 450 <= mouse[1] <= 500:
+            screen.blit(bomb, (screen_w / 2 + 50, 450))
+            selected = "bomb"
+        elif 500 <= mouse[0] <= 500 + 818/8.7 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 300/8.7:
+            shop_items[selected] = not shop_items[selected]
+            selected = "buy"
+            shop_display = not shop_display
+        elif screen_w - 600 <= mouse[0] <= screen_w - 600 + 510/4.5 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 155/4.5:
+            shop_display = not shop_display
+
+    if selected == "quinn":
+        screen.blit(quinn, (175, 250))
+    elif selected == "theresa":
+        screen.blit(theresa, (175, 350))
+    elif selected == "jekyll":
+        screen.blit(jekyll, (175, 450))
+    elif selected == "med_kit":
+        screen.blit(med_kit, (screen_w / 2 + 50, 250))
+    elif selected == "speed_potion":
+        screen.blit(speed_potion, (screen_w / 2 + 50, 350))
+    elif selected == "bomb":
+        screen.blit(bomb, (screen_w / 2 + 50, 450))
+
     screen.blit(quinn_def, (275, 255))
-    screen.blit(theresa, (175, 350))
     screen.blit(theresa_def, (275, 355))
-    screen.blit(jekyll, (175, 450))
     screen.blit(jekyll_def, (275, 455))
-    screen.blit(heal, (screen_w / 2 + 50, 250))
-    screen.blit(heal_def, (screen_w / 2 + 150, 255))
-    screen.blit(shield, (screen_w / 2 + 50, 350))
-    screen.blit(shield_def, (screen_w / 2 + 150, 355))
-    screen.blit(damage, (screen_w / 2 + 50, 450))
-    screen.blit(dmg_def, (screen_w / 2 + 150, 455))
+    screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
+    screen.blit(speed_potion_def, (screen_w / 2 + 150, 355))
+    screen.blit(bomb_def, (screen_w / 2 + 150, 455))
     screen.blit(buy_button, (500, screen_h - 150))
     screen.blit(back_button, (screen_w - 600, screen_h - 150))
-    
 
 # ----------------------------------- Game Play -----------------------------------
 
@@ -387,10 +457,12 @@ def bar(health, orig_health):
     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, screen_w, 80))
     draw_health_bar(health, orig_health)
     power_ups()
+    text = font.render(f'Points: {points}', True, (255, 255, 255))
+    screen.blit(text, (screen_w / 2 - text.get_width() / 2, 30))
 
 # Displays health bar
 def draw_health_bar(health, orig_health):
-    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (400, 30))
+    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (300, 30))
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
     text = font.render(str(int(health)), True, (255, 255, 255))
     if health > 70:
@@ -401,35 +473,37 @@ def draw_health_bar(health, orig_health):
         color = (255, 150, 50)
     else:
         color = (255, 0, 0)
-    pygame.draw.rect(screen, color, (85, 25, (health / orig_health) * 400, 30))
+    pygame.draw.rect(screen, color, (85, 25, (health / orig_health) * 300, 30))
     screen.blit(border, (85, 25))
     screen.blit(text, (25, 30))
 
 # Displays power-ups
 def power_ups():
-    grey_heal = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
-    grey_shield = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
-    grey_damage = pygame.transform.scale(pygame.image.load("images/test_char.png"), (50, 50))
-    heal = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (50, 50))
-    shield = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (50, 50))
-    damage = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (50, 50))
+    grey_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/grey_med_kit.png"), (50, 50))
+    grey_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/grey_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
+    grey_bomb = pygame.transform.scale(pygame.image.load("images/power-ups/grey_bomb.png"), (27 * (50/32), 32 * (50/32)))
+    
+    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_med_kit.png"), (50, 50))
+    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
+    bomb = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_bomb.png"), (27 * (50/32), 32 * (50/32)))
+    
     items = font.render('Items', True, (255, 255, 255))
     screen.blit(items, (screen_w - 300 - items.get_width(), 30))
 
-    if shop_items['heal'] == 1:
-        screen.blit(heal, (screen_w - 250, 15))
+    if shop_items['med_kit'] == True:
+        screen.blit(med_kit, (screen_w - 240, 15))
     else:
-        screen.blit(grey_heal, (screen_w - 250, 15))
+        screen.blit(grey_med_kit, (screen_w - 240, 15))
     
-    if shop_items['shield'] == 1:
-        screen.blit(shield, (screen_w - 175, 15))
+    if shop_items['speed_potion'] == True:
+        screen.blit(speed_potion, (screen_w - 175, 15))
     else:
-        screen.blit(grey_shield, (screen_w - 175, 15))
+        screen.blit(grey_speed_potion, (screen_w - 175, 15))
     
-    if shop_items['dmg'] == 1:
-        screen.blit(damage, (screen_w - 100, 15))
+    if shop_items['bomb'] == True:
+        screen.blit(bomb, (screen_w - 85, 15))
     else:
-        screen.blit(grey_damage, (screen_w - 100, 15))
+        screen.blit(grey_bomb, (screen_w - 85, 15))
 
 # Default character settings - player, position, speed
 player = John()
@@ -447,13 +521,13 @@ def movement():
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_LEFT or event.key == pygame.K_a:
             charX_change = -speed
-        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             charX_change = speed
-        if event.key == pygame.K_UP or event.key == pygame.K_w:
+        elif event.key == pygame.K_UP or event.key == pygame.K_w:
             charY_change = -speed
-        if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
             charY_change = speed
-        if event.key == pygame.K_b:
+        elif event.key == pygame.K_b:
             shop_display = not shop_display
 
     # Detects key released
@@ -471,7 +545,6 @@ def movement():
             charY = screen_h / 2 - 28
             charX_change = 0
             charY_change = 0
-            speed = 4
             game_state = 'start_menu'
 
 # Creates a border around the screen that stops the character from moving out of screen
@@ -481,18 +554,19 @@ def border():
         charX = 5
     if charX >= screen_w - 38:
         charX = screen_w - 38
-    if charY <= 5:
-        charY = 5
+    if charY <= 85:
+        charY = 85
     if charY >= screen_h - 60:
         charY = screen_h - 60
 
+    
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
 h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
 
 # Game Play Function
-def play(collides, shop_display):
-    global player, charX, charY, charX_change, charY_change, game_state, clock    
+def play(collides, shop_display, mouse):
+    global player, charX, charY, charX_change, charY_change, game_state, clock, points
     border()
     # Basic screen set-up
     screen.blit(player.bg, (0, 80))
@@ -513,6 +587,7 @@ def play(collides, shop_display):
     collide = pygame.Rect.colliderect(player.rect, test.rect)
     
     if collide:
+        points += 1
         collides += 1
         if collides > 60:
             collide = False
@@ -526,7 +601,7 @@ def play(collides, shop_display):
     
     # Display shop screen
     if shop_display:
-        shop()
+        shop(mouse)
     test.move(charX, charY, test.x, test.y)
 
 def game_over():
@@ -566,6 +641,7 @@ shop_display = False
 while running:
     screen.fill((255, 255, 255))
     mouse = pygame.mouse.get_pos()
+    all_keys = pygame.key.get_pressed()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
@@ -577,7 +653,7 @@ while running:
         startMenu()
     elif game_state == 'game_play':
         collides = 0
-        play(collides, shop_display)
+        play(collides, shop_display, mouse)
     elif game_state == 'game_over':
         game_over()
     elif game_state == 'tutorial':
