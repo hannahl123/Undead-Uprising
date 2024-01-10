@@ -13,6 +13,7 @@ import pygame
 from pygame.locals import *
 import sys
 import ctypes
+import math
 import random
 
 pygame.init()
@@ -335,7 +336,7 @@ def detect_start_menu():
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 0
+points = 1600
 
 shop_items = {
     "quinn" : False, 
@@ -346,10 +347,19 @@ shop_items = {
     "bomb" : False
 }
 
+costs = {
+    "quinn" : 1500,
+    "theresa" : 1500,
+    "jekyll" : 1500,
+    "med_kit" : 100,
+    "speed_potion" : 100,
+    "bomb" : 100
+}
+
 selected = ""
 
 def shop(mouse):
-    global selected, shop_display
+    global selected, shop_display, points
 
     # Images, text, etc.
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
@@ -382,9 +392,10 @@ def shop(mouse):
     normal_bomb = pygame.transform.scale(pygame.image.load("images/power-ups/normal_bomb.png"), (80, 80))
     bomb = pygame.transform.scale(pygame.image.load("images/power-ups/circled_bomb.png"), (80, 80))
     bomb_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    
+
     # Sign
     sign = pygame.image.load("images/test_char.png")
+    text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
 
     # Display images and text
     screen.blit(darken, (0, 0))
@@ -401,32 +412,41 @@ def shop(mouse):
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         if shop_items["quinn"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
-            if points <= 1500:
-                screen.blit(sign, (screen_w / 2 - sign.get_width() / 2, screen_h / 2 - sign.get_height() / 2))
-            else:
+            if points >= costs["quinn"]:
                 screen.blit(quinn, (175, 250))
                 selected = "quinn"
         elif shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
-            screen.blit(theresa, (175, 350))
-            selected = "theresa" 
+            if points >= costs["theresa"]:
+                screen.blit(theresa, (175, 350))
+                selected = "theresa"
         elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
-            screen.blit(jekyll, (175, 450))
-            selected = "jekyll"
+            if points >= costs["jekyll"]:
+                screen.blit(jekyll, (175, 450))
+                selected = "jekyll"
         elif shop_items["med_kit"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 250 <= mouse[1] <= 300:
-            screen.blit(med_kit, (screen_w / 2 + 50, 250))
-            selected = "med_kit"
+            if points >= costs["med_kit"]:
+                screen.blit(med_kit, (screen_w / 2 + 50, 250))
+                selected = "med_kit"
         elif shop_items["speed_potion"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 350 <= mouse[1] <= 400:
-            screen.blit(speed_potion, (screen_w / 2 + 50, 350))
-            selected = "speed_potion"
+            if points >= costs["speed_potion"]:
+                screen.blit(speed_potion, (screen_w / 2 + 50, 350))
+                selected = "speed_potion"
         elif shop_items["bomb"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 450 <= mouse[1] <= 500:
-            screen.blit(bomb, (screen_w / 2 + 50, 450))
-            selected = "bomb"
+            if points >= costs["bomb"]:
+                screen.blit(bomb, (screen_w / 2 + 50, 450))
+                selected = "bomb"
         elif 500 <= mouse[0] <= 500 + 818/8.7 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 300/8.7:
-            shop_items[selected] = not shop_items[selected]
-            selected = "buy"
-            shop_display = not shop_display
+            if points >= 1500:
+                shop_items[selected] = not shop_items[selected]
+                points -= costs[selected]
+                selected = "buy"
+                
+                shop_display = not shop_display
+            else:
+                screen.blit(text, (screen_w / 2 - text.get_width() / 2, screen_h / 2))
         elif screen_w - 600 <= mouse[0] <= screen_w - 600 + 510/4.5 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 155/4.5:
             shop_display = not shop_display
+        print(points)
 
     if selected == "quinn":
         screen.blit(quinn, (175, 250))
@@ -505,37 +525,93 @@ def power_ups():
     else:
         screen.blit(grey_bomb, (screen_w - 85, 15))
 
+# Bullets
+class Bullet:
+    bullet_img = pygame.image.load('images/test_char.png')
+    def __init__(self, x, y, mouse): # pass in current character position
+        self.x = x
+        self.y = y
+        self.x2 = mouse[0]
+        self.y2 = mouse[1]
+        self.img = Bullet.bullet_img
+        self.area = pygame.Surface([10, 10])
+        self.rect = self.area.get_rect()
+        self.speed = 2
+        self.vdist = mouse[1] - y
+        self.hdist = mouse[0] - x
+    
+    def update_pos(self, x, y, vx, vy):
+        Bullet.x += 2
+
 # Default character settings - player, position, speed
 player = John()
 charX = screen_w / 2 - 18
 charY = screen_h / 2 - 28
 charX_change = 0
 charY_change = 0
-speed = 5
+speed = -6
+diagspeed = -4
 
 # Detects events during game play state
 def movement():
     global charX, charY, charX_change, charY_change, mouse, game_state, player, speed, shop_display
-
+    pressed = pygame.key.get_pressed()
     # Detects key pressed
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            charX_change = -speed
-        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            charX_change = speed
-        elif event.key == pygame.K_UP or event.key == pygame.K_w:
-            charY_change = -speed
-        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            charY_change = speed
-        elif event.key == pygame.K_b:
+    if pressed[pygame.K_b]:
             shop_display = not shop_display
 
-    # Detects key released
-    if event.type == pygame.KEYUP:
-        if event.key == pygame.K_LEFT or event.key == pygame.K_a or event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            charX_change = 0
-        if event.key == pygame.K_UP or event.key == pygame.K_w or event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            charY_change = 0
+    if pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
+       charX_change = 0
+       charY_change = speed
+    if pressed[pygame.K_s] and not pressed[pygame.K_w] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
+       charX_change = 0
+       charY_change = -speed
+    if pressed[pygame.K_a] and not pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_d]:
+       charX_change = speed
+       charY_change = 0
+    if pressed[pygame.K_d] and not pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_a]:
+       charX_change = -speed
+       charY_change = 0
+    
+    if pressed[pygame.K_w] and pressed[pygame.K_a] and not pressed[pygame.K_s] and not pressed[pygame.K_d]:
+       charX_change = diagspeed
+       charY_change = diagspeed
+    if pressed[pygame.K_w] and pressed[pygame.K_s] and not pressed[pygame.K_a] and not pressed[pygame.K_wd]:
+        charX_change = 0
+        charY_change = 0
+    if pressed[pygame.K_w] and pressed[pygame.K_d] and not pressed[pygame.K_a] and not pressed[pygame.K_s]:
+        charX_change = -diagspeed
+        charY_change = diagspeed
+    if pressed[pygame.K_a] and pressed[pygame.K_s] and not pressed[pygame.K_w] and not pressed[pygame.K_d]:
+        charX_change = diagspeed
+        charY_change = -diagspeed
+    if pressed[pygame.K_a] and pressed[pygame.K_d] and not pressed[pygame.K_s] and not pressed[pygame.K_w]:
+        charX_change = 0
+        charY_change = 0
+    if pressed[pygame.K_s] and pressed[pygame.K_d] and not pressed[pygame.K_w] and not pressed[pygame.K_a]:
+        charX_change = -diagspeed
+        charY_change = -diagspeed
+    
+    if pressed[pygame.K_w] and pressed[pygame.K_a] and pressed[pygame.K_s] and not pressed[pygame.K_d]:
+        charX_change = speed
+        charY_change = 0
+    if pressed[pygame.K_w] and pressed[pygame.K_a] and pressed[pygame.K_d] and not pressed[pygame.K_s]:
+        charX_change = 0
+        charY_change = speed
+    if pressed[pygame.K_w] and pressed[pygame.K_s] and pressed[pygame.K_d] and not pressed[pygame.K_a]:
+        charX_change = -speed
+        charY_change = 0
+    if pressed[pygame.K_a] and pressed[pygame.K_s] and pressed[pygame.K_d] and not pressed[pygame.K_w]:
+        charX_change = 0
+        charY_change = -speed
+    
+    if pressed[pygame.K_w] and pressed[pygame.K_a] and pressed[pygame.K_s] and pressed[pygame.K_d]:
+        charX_change = 0
+        charY_change = 0
+
+    if not pressed[pygame.K_s] and not pressed[pygame.K_w] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
+       charX_change = 0
+       charY_change = 0
     
     # Detects back button clicked
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -559,7 +635,6 @@ def border():
     if charY >= screen_h - 60:
         charY = screen_h - 60
 
-    
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
 h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
@@ -641,10 +716,11 @@ shop_display = False
 while running:
     screen.fill((255, 255, 255))
     mouse = pygame.mouse.get_pos()
-    all_keys = pygame.key.get_pressed()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+            shop_display = not shop_display
         if game_state == 'start_menu':
             detect_start_menu()
         elif game_state == 'game_play':

@@ -1,195 +1,132 @@
-import pygame,sys
-  
-  
-#Color definitions
-BLUE = (10,10,128)
-RED = (255,0,0)
-BLACK = (0,0,0)
-#Screen width
-  
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-  
-  
+import pygame
+import sys
+import random
+
+#INTI
 pygame.init()
-  
-  
-  
-  
-class Player(pygame.sprite.Sprite):
-    def __init__(self,x,y):
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+PARTICLE = (255, 51, 51) #COLOR OF PARTICLERS AND ALSO PLAYER TEST MODEL
+RED = (255, 51, 51) # COLOR OF ENEMY TESTS
+
+# Player class
+class Player(pygame.sprite.Sprite): #random game I pulled, code necessary will be noted
+    def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([50,45])
-        self.image.fill(BLUE)
+        self.image = pygame.Surface((50, 50))
+        self.image.fill(PARTICLE) 
         self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.x = x
-        self.score = 0
-  
-        self.change_x = 0
-        self.change_y = 0
-        self.walls = None
-  
-    def changespeed(self,x,y):
-        self.change_x += x
-        self.change_y += y
-  
-    def update(self):
-        self.rect.x += self.change_x
-  
-        block_hit_list = pygame.sprite.spritecollide(self,self.walls, False)
-        for block in block_hit_list:
-            if self.change_x > 0:
-                self.rect.right = block.rect.left
-            else:
-                self.rect.left = block.rect.right
-  
-        self.rect.y += self.change_y
-  
-        block_hit_list = pygame.sprite.spritecollide(self,self.walls, False)
-        for block in block_hit_list:
-  
-            if self.change_y > 0:
-                self.rect.bottom = block.rect.top
-            else:
-                self.rect.top = block.rect.bottom
-  
-  
-class Player2(pygame.sprite.Sprite):
-    def __init__(self,x,y,human):
+        self.rect.center = (WIDTH // 2, HEIGHT // 2) #size of it
+
+        self.speed = 1 #speed of test player
+
+    def update(self): #move
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= self.speed
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += self.speed
+        if keys[pygame.K_UP]:
+            self.rect.y -= self.speed
+        if keys[pygame.K_DOWN]:
+            self.rect.y += self.speed
+
+#ENEMY EXISTER
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
         super().__init__()
-        self.human = human
-        self.image = pygame.Surface([50,45])
+        self.image = pygame.Surface((100, 100))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.x = x
-        self.score = 0
-  
-        self.rect.x = 400
-        self.rect.y = 40
-  
-        self.change_x = 0
-        self.change_y = 0
-        self.walls = None
-  
-    def changespeed(self,x,y):
-        self.change_x += x
-        self.change_y += y
-  
+        self.rect.center = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        self.speed = random.randint(1, 5)
+
     def update(self):
-        if self.human.rect.x > self.rect.x :
-            self.rect.x += 1
-        if self.human.rect.x < self.rect.x :
-            self.rect.x -= 1
-        if self.human.rect.y > self.rect.y :
-            self.rect.y += 1
-        if self.human.rect.y < self.rect.y :
-            self.rect.y -= 1
-  
-  
-  
-  
-  
-class Wall(pygame.sprite.Sprite):
-    def __init__(self,x,y,width,height):
+        self.rect.y += self.speed
+        if self.rect.top > HEIGHT:
+            self.rect.bottom = 0
+            self.rect.centerx = random.randint(0, WIDTH)
+
+#HERE
+
+#THIS IS THE PARTICLES
+class Particle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
         super().__init__()
-  
-        self.image = pygame.Surface([width, height])
-        self.image.fill(BLUE)
-  
+        self.image = pygame.Surface((4, 5))
+        self.image.fill(PARTICLE)
         self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.x = x
-  
-  
-  
-#Wall init
-  
-wall_list = pygame.sprite.Group()
-  
-#Pygame definitions
-  
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-pygame.display.set_caption('test!')
-all_sprite_list = pygame.sprite.Group()
-  
-  
-  
-  
-  
-#Left wall
-wall = Wall(0,0,10,600)
-wall_list.add(wall)
-all_sprite_list.add(wall)
-#top wall
-wall = Wall(10,0,790,10)
-wall_list.add(wall)
-all_sprite_list.add(wall)
-  
-#Right wall
-wall = Wall (790,0,10,600)
-wall_list.add(wall)
-all_sprite_list.add(wall)
-  
-#Bottom wall
-wall = Wall (0,590,1000,300)
-wall_list.add(wall)
-all_sprite_list.add(wall)
-  
-  
-#Create the player
-player = Player(50,50)
-all_sprite_list.add(player)
-player.walls = wall_list
-  
-player2 = Player2(50,50, player)
-all_sprite_list.add(player2)
-player2.walls = wall_list
-  
-  
+        self.rect.center = (x, y)
+        self.vx = random.uniform(-2, 1)
+        self.vy = random.uniform(-1, 2)
+        self.duration = FPS // 3 #FPS
+
+    def update(self):
+        self.rect.x += self.vx * 2
+        self.rect.y += self.vy * 2
+        self.duration -= 1
+        if self.duration <= 0:
+            self.kill()
+
+# Initialize game window
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Particle Effect Example")
 clock = pygame.time.Clock()
-  
-#Loop
-  
-done = False
-  
-while not done:
+
+#grouping stuf, only thing relevant to the particles is the thing called particles and all_sprites
+all_sprites = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
+particles = pygame.sprite.Group()
+
+player = Player()
+all_sprites.add(player)
+
+for _ in range(5):
+    enemy = Enemy()
+    all_sprites.add(enemy)
+    enemies.add(enemy)
+
+score = 0
+
+#gameshot
+running = True
+while running:
+    # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            done = True
-  
-  
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
-                player.changespeed(-3, 0)
-            elif event.key == pygame.K_d:
-                player.changespeed(3,0)
-            elif event.key == pygame.K_w:
-                player.changespeed(0,-3)
-            elif event.key == pygame.K_s:
-                player.changespeed(0,3)
-  
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_a:
-                player.changespeed(3,0)
-            elif event.key == pygame.K_d:
-                player.changespeed(-3,0)
-            elif event.key == pygame.K_w:
-                player.changespeed(0,3)
-            elif event.key == pygame.K_s:
-                player.changespeed(0,-3)
-  
-  
-    all_sprite_list.update()
-    screen.fill(BLACK)
-    all_sprite_list.draw(screen)
+            running = False
+
+    #THIS IS THE PART OF THE CODE THAT MAKES IT SO WHEN THE SQUARE 
+    all_sprites.update()
+
+    #PLAYER COLLIDE TO ENEMIES, PARTICLES MADE
+    hits = pygame.sprite.spritecollide(player, enemies, True)
+    for hit in hits:
+        score += 1
+        for _ in range(20):  # Create 20 particles for each enemy hit
+            particle = Particle(hit.rect.centerx, hit.rect.centery)
+            all_sprites.add(particle)
+            particles.add(particle)
+#SCREEN
+    screen.fill((0, 0, 0))
+    all_sprites.draw(screen)
+
+    #SCORE
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, PARTICLE)
+    screen.blit(score_text, (10, 10))
+
+    #display
     pygame.display.flip()
-    clock.tick(60)
-    pygame.display.flip()
-  
-  
-  
-  
-  
+
+    #FPS
+    clock.tick(FPS)
+    FPS = (60)
+
+#the end:(
 pygame.quit()
+sys.exit()
+
+
