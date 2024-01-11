@@ -212,12 +212,6 @@ class normalZombie:
             screen.blit(normalZombie.zombie_half_health, (normalZombie.x, normalZombie.y))
         else:
             screen.blit(logo, (normalZombie.x, normalZombie.y))
-    
-    def move(self, charX, charY, zombieX, zombieY):
-        dx, dy = charX - zombieX, charY - zombieY
-        stepx, stepy = dx / fps, dy / fps
-        normalZombie.x -= stepx
-        normalZombie.y -= stepy
 
 def generate():
     randNum = random.randint(0, 3)
@@ -233,6 +227,7 @@ def generate():
     zombie.rect.x = zombie.x
     zombie.rect.y = zombie.y
     return zombie
+
 test = generate()
 
 # ----------------------------------- Start Menu -----------------------------------
@@ -634,7 +629,7 @@ back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png")
 h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
 
 # Game Play Function
-def play(collides, shop_display, mouse):
+def play(shop_display, mouse):
     global player, charX, charY, charX_change, charY_change, game_state, clock, points
     border()
     # Basic screen set-up
@@ -649,6 +644,7 @@ def play(collides, shop_display, mouse):
     charY += charY_change
     player.rect.x = charX
     player.rect.y = charY
+
     all_sprites.update() 
     all_sprites.draw(screen)
     
@@ -657,13 +653,9 @@ def play(collides, shop_display, mouse):
     
     if collide:
         points += 1
-        collides += 1
-        if collides > 60:
-            collide = False
-        else:
-            player.health -= 1
+        player.health -= 1
         print('collided')
-    
+
     # Game end
     if player.health == 0:
         game_state = 'game_over'
@@ -671,7 +663,6 @@ def play(collides, shop_display, mouse):
     # Display shop screen
     if shop_display:
         shop(mouse)
-    test.move(charX, charY, test.x, test.y)
 
 def game_over():
     # Images
@@ -731,7 +722,6 @@ character = "John" # default character
 # ----------------------------------- Main Loop of Game -----------------------------------
 
 running = True
-collides = 0
 shop_display = False
 
 while running:
@@ -758,8 +748,7 @@ while running:
     elif game_state == "bg_story":
         background_story()
     elif game_state == "game_play":
-        collides = 0
-        play(collides, shop_display, mouse)
+        play(shop_display, mouse)
     elif game_state == "game_over":
         game_over()
     elif game_state == "tutorial":
