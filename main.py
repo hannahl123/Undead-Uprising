@@ -4,6 +4,7 @@
 # Lines 188 - 236 Zombie Classes and Generating
 # Lines 237 - 338 Start Menu
 # Lines 339 - 466 Shop
+# Lines 467 - ??? Power-ups
 # Lines 467 - 686 Game Play Functions (game over, movement detection, top bar, border, health bar, back button, etc.)
 # Lines 687 - 711 Background Stories
 # Lines 712 - 719 Tutorial
@@ -118,12 +119,10 @@ class Quinn():
         self.speed = 'normal'
 
     def show():
-        if Quinn.clicked and shop_items["quinn"] == True:
+        if Quinn.clicked:
             screen.blit(Quinn.h_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
         else:
             screen.blit(Quinn.char_img, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
-        if shop_items["quinn"] == False:
-            screen.blit(Quinn.grey_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
 
     def special():
         screen.blit(logo, (0, 0))
@@ -292,8 +291,7 @@ def detect_start_menu():
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, True, False, False, False
             print('Swift is picked')
-        # Special characters
-        elif shop_items["quinn"] == True and screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+        elif screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Quinn()
             picked_character = "Quinn"
             if Quinn.clicked:
@@ -301,6 +299,7 @@ def detect_start_menu():
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, True, False, False
             print('Quinn is picked')
+        # Special characters
         elif shop_items["theresa"] == True and screen_w * (0.28 + 4 * 0.077) <= mouse[0] <= screen_w * (0.28 + 4 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Theresa()
             picked_character = "Theresa"
@@ -336,21 +335,17 @@ def detect_start_menu():
 points = 1600
 
 shop_items = {
-    "quinn" : False, 
     "theresa" : False, 
     "jekyll" : False,
     "med_kit" : False,
     "speed_potion" : False,
-    "bomb" : False
 }
 
 costs = {
-    "quinn" : 1500,
-    "theresa" : 1500,
-    "jekyll" : 1500,
+    "theresa" : 1000,
+    "jekyll" : 1000,
     "med_kit" : 100,
     "speed_potion" : 100,
-    "bomb" : 100
 }
 
 selected = ""
@@ -369,9 +364,6 @@ def shop(mouse):
     buy_button = pygame.transform.scale(pygame.image.load("images/BUY_button.png"), (818/8.7, 300/8.7))
 
     # Character images and definitions
-    quinn = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (80, 80))
-    normal_quinn = pygame.transform.scale(pygame.image.load("images/characters/normal_quinn.png"), (80, 80))
-    quinn_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
     theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (80, 80))
     normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png"), (80, 80))
     theresa_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
@@ -386,12 +378,8 @@ def shop(mouse):
     normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png"), (80, 80))
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png"), (80, 80))
     speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-    normal_bomb = pygame.transform.scale(pygame.image.load("images/power-ups/normal_bomb.png"), (80, 80))
-    bomb = pygame.transform.scale(pygame.image.load("images/power-ups/circled_bomb.png"), (80, 80))
-    bomb_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
-
+    
     # Sign
-    sign = pygame.image.load("images/test_char.png")
     text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
 
     # Display images and text
@@ -401,17 +389,12 @@ def shop(mouse):
     screen.blit(title1, (300, 185))
     screen.blit(title2, (800, 185))
     screen.blit(normal_theresa, (175, 350))
-    screen.blit(normal_quinn, (175, 250))
     screen.blit(normal_jekyll, (175, 450))
     screen.blit(normal_med_kit, (screen_w / 2 + 50, 250))
     screen.blit(normal_speed_potion, (screen_w / 2 + 50, 350))
-    screen.blit(normal_bomb, (screen_w / 2 + 50, 450))
 
     if event.type == pygame.MOUSEBUTTONDOWN:
-        if shop_items["quinn"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
-            screen.blit(quinn, (175, 250))
-            selected = "quinn"
-        elif shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
+        if shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
             screen.blit(theresa, (175, 350))
             selected = "theresa"
         elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
@@ -423,9 +406,6 @@ def shop(mouse):
         elif shop_items["speed_potion"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 350 <= mouse[1] <= 400:
             screen.blit(speed_potion, (screen_w / 2 + 50, 350))
             selected = "speed_potion"
-        elif shop_items["bomb"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 450 <= mouse[1] <= 500:
-            screen.blit(bomb, (screen_w / 2 + 50, 450))
-            selected = "bomb"
         elif 500 <= mouse[0] <= 500 + 818/8.7 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 300/8.7:
             if points >= costs[selected]:
                 shop_items[selected] = not shop_items[selected]
@@ -437,9 +417,7 @@ def shop(mouse):
         elif screen_w - 600 <= mouse[0] <= screen_w - 600 + 510/4.5 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 155/4.5:
             shop_display = not shop_display
 
-    if selected == "quinn":
-        screen.blit(quinn, (175, 250))
-    elif selected == "theresa":
+    if selected == "theresa":
         screen.blit(theresa, (175, 350))
     elif selected == "jekyll":
         screen.blit(jekyll, (175, 450))
@@ -447,15 +425,11 @@ def shop(mouse):
         screen.blit(med_kit, (screen_w / 2 + 50, 250))
     elif selected == "speed_potion":
         screen.blit(speed_potion, (screen_w / 2 + 50, 350))
-    elif selected == "bomb":
-        screen.blit(bomb, (screen_w / 2 + 50, 450))
 
-    screen.blit(quinn_def, (275, 255))
     screen.blit(theresa_def, (275, 355))
     screen.blit(jekyll_def, (275, 455))
     screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
     screen.blit(speed_potion_def, (screen_w / 2 + 150, 355))
-    screen.blit(bomb_def, (screen_w / 2 + 150, 455))
     screen.blit(buy_button, (500, screen_h - 150))
     screen.blit(back_button, (screen_w - 600, screen_h - 150))
 
@@ -490,29 +464,21 @@ def draw_health_bar(health, orig_health):
 def power_ups():
     grey_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/grey_med_kit.png"), (50, 50))
     grey_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/grey_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
-    grey_bomb = pygame.transform.scale(pygame.image.load("images/power-ups/grey_bomb.png"), (27 * (50/32), 32 * (50/32)))
-    
     med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_med_kit.png"), (50, 50))
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
-    bomb = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_bomb.png"), (27 * (50/32), 32 * (50/32)))
     
     items = font.render('Items', True, (255, 255, 255))
-    screen.blit(items, (screen_w - 300 - items.get_width(), 30))
+    screen.blit(items, (screen_w - 200 - items.get_width(), 30))
 
     if shop_items['med_kit'] == True:
-        screen.blit(med_kit, (screen_w - 240, 15))
+        screen.blit(med_kit, (screen_w - 170, 15))
     else:
-        screen.blit(grey_med_kit, (screen_w - 240, 15))
+        screen.blit(grey_med_kit, (screen_w - 170, 15))
     
     if shop_items['speed_potion'] == True:
-        screen.blit(speed_potion, (screen_w - 175, 15))
+        screen.blit(speed_potion, (screen_w - 100, 15))
     else:
-        screen.blit(grey_speed_potion, (screen_w - 175, 15))
-    
-    if shop_items['bomb'] == True:
-        screen.blit(bomb, (screen_w - 85, 15))
-    else:
-        screen.blit(grey_bomb, (screen_w - 85, 15))
+        screen.blit(grey_speed_potion, (screen_w - 100, 15))
 
 # Bullets
 class Bullet:
@@ -528,7 +494,7 @@ class Bullet:
         self.speed = 2
         self.vdist = mouse[1] - y
         self.hdist = mouse[0] - x
-    
+
     def update_pos(self, x, y, vx, vy):
         Bullet.x += 2
 
