@@ -2,12 +2,13 @@
 # Lines 1 - 30 Basic Setup of Game Screen Settings (libraries, init, size)
 # Lines 31 - 187 Character Classes (attributes, functions, etc.)
 # Lines 188 - 236 Zombie Classes and Generating
-# Lines 237 - 334 Start Menu
-# Lines 335 - 446 Shop
-# Lines 446 - 611 Game Play Functions (movement detection, border, health bar, back button, etc.)
-# Lines 612 - 616 Tutorial
-# Lines 617 - 627 Game Details (logo, title, character, state)
-# Lines 628 - 658 Main Loop of Game (while loop, time, fps, etc.)
+# Lines 237 - 338 Start Menu
+# Lines 339 - 466 Shop
+# Lines 467 - 686 Game Play Functions (game over, movement detection, top bar, border, health bar, back button, etc.)
+# Lines 687 - 711 Background Stories
+# Lines 712 - 719 Tutorial
+# Lines 720 - 730 Game Details (logo, title, character, state)
+# Lines 731 - 765 Main Loop of Game (while loop, time, fps, etc.)
 
 import pygame
 from pygame.locals import *
@@ -27,7 +28,6 @@ screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
 font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
 fps = 60
 clock = pygame.time.Clock()
-time = 0
 
 # ---------------------------------------- Characters ----------------------------------------
 class John():
@@ -233,7 +233,6 @@ def generate():
     zombie.rect.x = zombie.x
     zombie.rect.y = zombie.y
     return zombie
-
 test = generate()
 
 # ----------------------------------- Start Menu -----------------------------------
@@ -265,20 +264,18 @@ def startMenu():
     Theresa.show()
     Jekyll.show()
 
+picked_character = ""
+
 # Detects events during start menu state
 def detect_start_menu():
-    global game_state, character, player
-
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_z:
-            shop(mouse)
+    global game_state, character, player, picked_character
 
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
-
         # Sets player to character clicked
         if screen_w * 0.28 <= mouse[0] <= screen_w * 0.28 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = John()
+            picked_character = "John"
             if John.clicked:
                 John.clicked = not John.clicked
             else:
@@ -286,6 +283,7 @@ def detect_start_menu():
             print('John is picked')
         elif screen_w * (0.28 + 0.077) <= mouse[0] <= screen_w * (0.28 + 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Tony()
+            picked_character =  "Tony"
             if Tony.clicked:
                 Tony.clicked = not Tony.clicked
             else:
@@ -293,6 +291,7 @@ def detect_start_menu():
             print('Tony is picked')
         elif screen_w * (0.28 + 2 * 0.077) <= mouse[0] <= screen_w * (0.28 + 2 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Swift()
+            picked_character = "Swift"
             if Swift.clicked:
                 Swift.clicked = not Swift.clicked
             else:
@@ -301,6 +300,7 @@ def detect_start_menu():
         # Special characters
         elif shop_items["quinn"] == True and screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Quinn()
+            picked_character = "Quinn"
             if Quinn.clicked:
                 Quinn.clicked = not Quinn.clicked
             else:
@@ -308,6 +308,7 @@ def detect_start_menu():
             print('Quinn is picked')
         elif shop_items["theresa"] == True and screen_w * (0.28 + 4 * 0.077) <= mouse[0] <= screen_w * (0.28 + 4 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Theresa()
+            picked_character = "Theresa"
             if Theresa.clicked:
                 Theresa.clicked = not Theresa.clicked
             else:
@@ -315,16 +316,17 @@ def detect_start_menu():
             print('Theresa is picked')
         elif shop_items["jekyll"] == True and screen_w * (0.28 + 5 * 0.077) <= mouse[0] <= screen_w * (0.28 + 5 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             player = Jekyll()
+            picked_character = "Jekyll"
             if Jekyll.clicked:
                 Jekyll.clicked = not Jekyll.clicked
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, False, False, True
             print('Jekyll is picked')
-        
-        # Changes game state to game_play if start button is clicked
+
+        # If start button clicked, load background story
         elif screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
             # if the start button was pressed, set the game state to game_play, which executes the next part of the game
-            game_state = "game_play"
+            game_state = "bg_story"
         
         # Changes game state to tutorial if  tutorial button is clicked
         elif 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
@@ -412,41 +414,33 @@ def shop(mouse):
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         if shop_items["quinn"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
-            if points >= costs["quinn"]:
-                screen.blit(quinn, (175, 250))
-                selected = "quinn"
+            screen.blit(quinn, (175, 250))
+            selected = "quinn"
         elif shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
-            if points >= costs["theresa"]:
-                screen.blit(theresa, (175, 350))
-                selected = "theresa"
+            screen.blit(theresa, (175, 350))
+            selected = "theresa"
         elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
-            if points >= costs["jekyll"]:
-                screen.blit(jekyll, (175, 450))
-                selected = "jekyll"
+            screen.blit(jekyll, (175, 450))
+            selected = "jekyll"
         elif shop_items["med_kit"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 250 <= mouse[1] <= 300:
-            if points >= costs["med_kit"]:
-                screen.blit(med_kit, (screen_w / 2 + 50, 250))
-                selected = "med_kit"
+            screen.blit(med_kit, (screen_w / 2 + 50, 250))
+            selected = "med_kit"
         elif shop_items["speed_potion"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 350 <= mouse[1] <= 400:
-            if points >= costs["speed_potion"]:
-                screen.blit(speed_potion, (screen_w / 2 + 50, 350))
-                selected = "speed_potion"
+            screen.blit(speed_potion, (screen_w / 2 + 50, 350))
+            selected = "speed_potion"
         elif shop_items["bomb"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 450 <= mouse[1] <= 500:
-            if points >= costs["bomb"]:
-                screen.blit(bomb, (screen_w / 2 + 50, 450))
-                selected = "bomb"
+            screen.blit(bomb, (screen_w / 2 + 50, 450))
+            selected = "bomb"
         elif 500 <= mouse[0] <= 500 + 818/8.7 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 300/8.7:
-            if points >= 1500:
+            if points >= costs[selected]:
                 shop_items[selected] = not shop_items[selected]
                 points -= costs[selected]
                 selected = "buy"
-                
                 shop_display = not shop_display
             else:
                 screen.blit(text, (screen_w / 2 - text.get_width() / 2, screen_h / 2))
         elif screen_w - 600 <= mouse[0] <= screen_w - 600 + 510/4.5 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 155/4.5:
             shop_display = not shop_display
-        print(points)
 
     if selected == "quinn":
         screen.blit(quinn, (175, 250))
@@ -682,18 +676,46 @@ def play(collides, shop_display, mouse):
 def game_over():
     # Images
     game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png"), (screen_w, screen_h))
-    try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png"), (1000/3, 150/3))
-    quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png"), (250*0.9, 100*0.9))
+    try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png"), (325, 50))
+    quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png"), (225, 90))
 
     # Display images
     screen.blit(game_over_screen, (0, 0))
     screen.blit(try_again, (200, screen_h - 150))
     screen.blit(quit, (screen_w - 500, screen_h - 175))
 
+# ----------------------------------- Background Stories -----------------------------------
+            
+def background_story():
+    global picked_character, game_state
+    john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    tony = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    swift = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png"), (275, 40))
+    if picked_character == "John":
+        screen.blit(john, (0, 0))
+    elif picked_character == "Tony":
+        screen.blit(tony, (0, 0))
+    elif picked_character == "Swift":
+        screen.blit(swift, (0, 0))
+    elif picked_character == "Quinn":
+        screen.blit(quinn, (0, 0))
+    elif picked_character == "Theresa":
+        screen.blit(theresa, (0, 0))
+    elif picked_character == "Jekyll":
+        screen.blit(jekyll, (0, 0))
+    screen.blit(continue_button, (screen_w - 350, screen_h - 100))   
+
 # ----------------------------------- Tutorial -----------------------------------
 
 def tutorial():
-    screen.blit(logo, (0, 0))
+    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png"), (screen_w, screen_h))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
+    screen.blit(tut, (0, 0))
+    screen.blit(back_button, (screen_w - 200, screen_h - 100))
 
 # ----------------------------------- Game Details -----------------------------------
 
@@ -703,12 +725,11 @@ logo = pygame.image.load('images/test_char.png')
 pygame.display.set_icon(logo)
 
 # State of game and character choice
-game_state = "start_menu" # start_menu, game_play, or tutorial
+game_state = "start_menu" # start_menu, bg_story, game_play, or tutorial
 character = "John" # default character
 
 # ----------------------------------- Main Loop of Game -----------------------------------
 
-# Keeps track of game time
 running = True
 collides = 0
 shop_display = False
@@ -721,20 +742,27 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
             shop_display = not shop_display
-        if game_state == 'start_menu':
+        if game_state == "start_menu":
             detect_start_menu()
-        elif game_state == 'game_play':
+        elif game_state == "bg_story":
+            if event.type == pygame.MOUSEBUTTONDOWN and screen_w - 350 <= mouse[0] <= screen_w - 75 and screen_h - 100 <= mouse[1] <= screen_h - 60:
+                game_state = "game_play"
+        elif game_state == "game_play":
             movement()
-    if game_state == 'start_menu':
+        elif game_state == "game_over":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 200 <= mouse[0] <= 525 and screen_h - 150 <= mouse[1] <= screen_h - 100:
+                    game_state = "start_menu"
+    if game_state == "start_menu":
         startMenu()
-    elif game_state == 'game_play':
+    elif game_state == "bg_story":
+        background_story()
+    elif game_state == "game_play":
         collides = 0
         play(collides, shop_display, mouse)
-    elif game_state == 'game_over':
+    elif game_state == "game_over":
         game_over()
-    elif game_state == 'tutorial':
+    elif game_state == "tutorial":
         tutorial()
     pygame.display.update()
     clock.tick(fps)
-
-print(time)
