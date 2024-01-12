@@ -1,132 +1,96 @@
 import pygame
-import sys
 import random
 
-#INTI
+
+# Initialize Pygame
 pygame.init()
 
-# Constants
-WIDTH, HEIGHT = 800, 600
-FPS = 60
-PARTICLE = (255, 51, 51) #COLOR OF PARTICLERS AND ALSO PLAYER TEST MODEL
-RED = (255, 51, 51) # COLOR OF ENEMY TESTS
+
+# Set up screen
+screen_width, screen_height = 800, 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Auto-generating Zombies")
+
+
+# Colors
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
 
 # Player class
-class Player(pygame.sprite.Sprite): #random game I pulled, code necessary will be noted
+class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill(PARTICLE) 
-        self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH // 2, HEIGHT // 2) #size of it
-
-        self.speed = 1 #speed of test player
-
-    def update(self): #move
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= self.speed
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += self.speed
-        if keys[pygame.K_UP]:
-            self.rect.y -= self.speed
-        if keys[pygame.K_DOWN]:
-            self.rect.y += self.speed
-
-#ENEMY EXISTER
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.Surface((100, 100))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
-        self.rect.center = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
-        self.speed = random.randint(1, 5)
+        self.rect.center = (screen_width // 2, screen_height // 2)
 
-    def update(self):
-        self.rect.y += self.speed
-        if self.rect.top > HEIGHT:
-            self.rect.bottom = 0
-            self.rect.centerx = random.randint(0, WIDTH)
 
-#HERE
-
-#THIS IS THE PARTICLES
-class Particle(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+# Zombie class
+class Zombie(pygame.sprite.Sprite):
+    def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((4, 5))
-        self.image.fill(PARTICLE)
+        self.image = pygame.Surface((30, 30))
+        self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        self.vx = random.uniform(-2, 1)
-        self.vy = random.uniform(-1, 2)
-        self.duration = FPS // 3 #FPS
+        self.rect.center = (random.randint(50, screen_width - 50), random.randint(50, screen_height - 50))
+        self.speed = random.randint(1, 3)
+
 
     def update(self):
-        self.rect.x += self.vx * 2
-        self.rect.y += self.vy * 2
-        self.duration -= 1
-        if self.duration <= 0:
-            self.kill()
+        # Move the zombie towards the player (for illustration purposes)
+        if self.rect.x < player.rect.x:
+            self.rect.x += self.speed
+        elif self.rect.x > player.rect.x:
+            self.rect.x -= self.speed
+        if self.rect.y < player.rect.y:
+            self.rect.y += self.speed
+        elif self.rect.y > player.rect.y:
+            self.rect.y -= self.speed
 
-# Initialize game window
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Particle Effect Example")
-clock = pygame.time.Clock()
 
-#grouping stuf, only thing relevant to the particles is the thing called particles and all_sprites
-all_sprites = pygame.sprite.Group()
-enemies = pygame.sprite.Group()
-particles = pygame.sprite.Group()
-
+# Create player sprite
 player = Player()
+
+
+# Create groups for sprites
+all_sprites = pygame.sprite.Group()
+zombies = pygame.sprite.Group()
 all_sprites.add(player)
 
-for _ in range(5):
-    enemy = Enemy()
-    all_sprites.add(enemy)
-    enemies.add(enemy)
 
-score = 0
+# Timer event for generating zombies
+ADDZOMBIE = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDZOMBIE, 5000)  # Generates a new zombie every 5 seconds
 
-#gameshot
+
+# Game loop
 running = True
 while running:
-    # Event handling
+    screen.fill((0, 0, 0))
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == ADDZOMBIE:
+            new_zombie = Zombie()
+            zombies.add(new_zombie)
+            all_sprites.add(new_zombie)
 
-    #THIS IS THE PART OF THE CODE THAT MAKES IT SO WHEN THE SQUARE 
+
+    # Update
     all_sprites.update()
 
-    #PLAYER COLLIDE TO ENEMIES, PARTICLES MADE
-    hits = pygame.sprite.spritecollide(player, enemies, True)
-    for hit in hits:
-        score += 1
-        for _ in range(20):  # Create 20 particles for each enemy hit
-            particle = Particle(hit.rect.centerx, hit.rect.centery)
-            all_sprites.add(particle)
-            particles.add(particle)
-#SCREEN
-    screen.fill((0, 0, 0))
+
+    # Draw
     all_sprites.draw(screen)
 
-    #SCORE
-    font = pygame.font.Font(None, 36)
-    score_text = font.render(f"Score: {score}", True, PARTICLE)
-    screen.blit(score_text, (10, 10))
 
-    #display
     pygame.display.flip()
 
-    #FPS
-    clock.tick(FPS)
-    FPS = (60)
 
-#the end:(
 pygame.quit()
-sys.exit()
 
 

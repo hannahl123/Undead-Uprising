@@ -644,12 +644,12 @@ def game_over():
 # ----------------------------------- Background Stories -----------------------------------
             
 def background_story():
-    global picked_character, game_state
+    global picked_character
     john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    tony = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    swift = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
+    tony = pygame.transform.scale(pygame.image.load("images/back_stories/Tony_backstory.png"), (screen_w, screen_h))
+    swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png"), (screen_w, screen_h))
+    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png"), (screen_w, screen_h))
+    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png"), (screen_w, screen_h))
     jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
     continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png"), (275, 40))
     if picked_character == "John":
