@@ -14,13 +14,14 @@
 
 import pygame
 from pygame.locals import *
+from pygame import mixer
 import sys
 import ctypes
 import math
 import random
 
 pygame.init()
-
+mixer.init()
 # ---------------------------------------- Screen Settings ----------------------------------------
 
 # Setting size of screen to full screen
@@ -52,8 +53,14 @@ class John():
     def show():
         if John.clicked:
             screen.blit(John.h_john, (screen_w * 0.28, screen_h / 2 + 20))
+            John.music()
         else:
             screen.blit(John.char_img, (screen_w * 0.28, screen_h / 2 + 20))
+    
+    def music():
+        mixer.music.load('background_music/earth.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
 class Tony():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
@@ -75,8 +82,14 @@ class Tony():
     def show():
         if Tony.clicked:
             screen.blit(Tony.h_tony, (screen_w * (0.28 + 0.077), screen_h / 2 + 20))
+            Tony.music()
         else:
             screen.blit(Tony.char_img, (screen_w * (0.28 + 0.077), screen_h / 2 + 20))
+    
+    def music():
+        mixer.music.load('background_music/earth.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
 class Swift():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_track.png'), (screen_w, screen_h))
@@ -98,8 +111,14 @@ class Swift():
     def show():
         if Swift.clicked:
             screen.blit(Swift.h_swift, (screen_w * (0.28 + 2 * 0.077), screen_h / 2 + 20))
+            Swift.music()
         else:
             screen.blit(Swift.char_img, (screen_w * (0.28 + 2 * 0.077), screen_h / 2 + 20))
+    
+    def music():
+        mixer.music.load('background_music/rainbow.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
 class Quinn():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png'), (screen_w, screen_h))
@@ -122,8 +141,14 @@ class Quinn():
     def show():
         if Quinn.clicked:
             screen.blit(Quinn.h_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
+            Quinn.music()
         else:
             screen.blit(Quinn.char_img, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
+
+    def music():
+        mixer.music.load('background_music/magma.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
     def special():
         screen.blit(logo, (0, 0))
@@ -149,10 +174,16 @@ class Theresa():
     def show():
         if Theresa.clicked and shop_items["theresa"] == True:
             screen.blit(Theresa.h_theresa, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
+            Theresa.music()
         else:
             screen.blit(Theresa.char_img, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
         if shop_items["theresa"] == False:
             screen.blit(Theresa.grey_theresa, (screen_w * (0.28 + 4 * 0.077), screen_h / 2 + 20))
+
+    def music():
+        mixer.music.load('background_music/hospital.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
     def special():
         screen.blit(logo, (0, 0))
@@ -178,10 +209,16 @@ class Jekyll():
     def show():
         if Jekyll.clicked and shop_items["jekyll"] == True:
             screen.blit(Jekyll.h_jekyll, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
+            Jekyll.music()
         else:
             screen.blit(Jekyll.char_img, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
         if shop_items["jekyll"] == False:
             screen.blit(Jekyll.grey_jekyll, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
+
+    def music():
+        mixer.music.load('background_music/snow.mp3')
+        mixer.music.play(-1)
+        mixer.music.set_volume(0.5)
 
     def special():
         screen.blit(logo, (0, 0))
@@ -232,6 +269,10 @@ test = generate()
 
 # ----------------------------------- Start Menu -----------------------------------
 
+bg_music = mixer.Sound('background_music/mainpage.mp3')
+bg_music.play(-1)
+mixer.music.set_volume(0.5)
+
 def startMenu():
     # Images and Text
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
@@ -241,7 +282,7 @@ def startMenu():
     tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png'), (115, 115))
     start_b = pygame.transform.scale(pygame.image.load('images/START_button.png'), (150, 60))
     quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png'), (150, 60))
-
+    
     # Display images, text and buttons
     screen.blit(bg, (0, 0)) # background
     screen.blit(title_img, ((screen_w - 800) / 2, 125)) # title
