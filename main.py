@@ -1,4 +1,5 @@
-# All code for Undead Uprising
+# All code for Undead Uprising - Updated as of Jan 11, 2024
+# Note that the table of contents may be slightly out of date - just gives you an overall idea of where each part is
 # Lines 1 - 30 Basic Setup of Game Screen Settings (libraries, init, size)
 # Lines 31 - 187 Character Classes (attributes, functions, etc.)
 # Lines 188 - 236 Zombie Classes and Generating
@@ -709,6 +710,8 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 200 <= mouse[0] <= 525 and screen_h - 150 <= mouse[1] <= screen_h - 100:
                     game_state = "start_menu"
+                if screen_w - 500 <= mouse[0] <= screen_w - 500 + 225 and screen_h - 175 <= mouse[1] <= screen_h - 85:
+                    running = False
     if game_state == "start_menu":
         startMenu()
     elif game_state == "bg_story":
