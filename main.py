@@ -1,4 +1,4 @@
-# All code for Undead Uprising - Updated as of Jan 11, 2024
+# All code for Undead Uprising - Updated as of Jan 14, 2024
 # Note that the table of contents may be slightly out of date - just gives you an overall idea of where each part is
 # Lines 1 - 30 Basic Setup of Game Screen Settings (libraries, init, size)
 # Lines 31 - 187 Character Classes (attributes, functions, etc.)
@@ -19,6 +19,7 @@ import sys
 import ctypes
 import math
 import random
+import pygame.gfxdraw
 
 pygame.init()
 mixer.init()
@@ -269,11 +270,21 @@ test = generate()
 
 # ----------------------------------- Start Menu -----------------------------------
 
-bg_music = mixer.Sound('background_music/mainpage.mp3')
+"""bg_music = mixer.Sound('background_music/mainpage.mp3')
 bg_music.play(-1)
-mixer.music.set_volume(0.5)
+mixer.music.set_volume(0.5)"""
+
+def music():
+    mixer.music.load('background_music/mainpage.mp3')
+    mixer.music.play(-1)
+    mixer.music.set_volume(0.5)
+
+music()
+
+hovering_tutorial_b, hovering_start_b, hovering_quit_b = False, False, False
 
 def startMenu():
+    global hovering_quit_b, hovering_start_b, hovering_tutorial_b
     # Images and Text
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
     title_img = pygame.image.load('images/UNDEAD UPRISING.png')
@@ -282,15 +293,27 @@ def startMenu():
     tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png'), (115, 115))
     start_b = pygame.transform.scale(pygame.image.load('images/START_button.png'), (150, 60))
     quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png'), (150, 60))
-    
+    high_tutorial_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_TUTORIAL_button.png'), (115, 115))
+    high_start_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_START_button.png'), (150, 60))
+    high_quit_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_QUIT_button.png'), (150, 60))
+
     # Display images, text and buttons
     screen.blit(bg, (0, 0)) # background
     screen.blit(title_img, ((screen_w - 800) / 2, 125)) # title
     screen.blit(text, (screen_w / 2 - text.get_width() / 2, 250)) # instruction
     screen.blit(border, (screen_w / 2 - 350, screen_h / 2 - 50)) # border
-    screen.blit(start_b, (screen_w / 2 - 200, screen_h - 140))
-    screen.blit(quit_b, (screen_w / 2 + 55, screen_h - 140))
-    screen.blit(tutorial_b, (25, screen_h - 25 - 115))
+    if hovering_start_b:
+        screen.blit(high_start_b, (screen_w / 2 - 200, screen_h - 140))
+    else:
+        screen.blit(start_b, (screen_w / 2 - 200, screen_h - 140))
+    if hovering_quit_b:
+        screen.blit(high_quit_b, (screen_w / 2 + 55, screen_h - 140))
+    else:
+        screen.blit(quit_b, (screen_w / 2 + 55, screen_h - 140))
+    if hovering_tutorial_b:
+        screen.blit(high_tutorial_b, (25, screen_h - 25 - 115))
+    else:
+        screen.blit(tutorial_b, (25, screen_h - 25 - 115))
 
     # Display all character images
     John.show()
@@ -304,7 +327,7 @@ picked_character = ""
 
 # Detects events during start menu state
 def detect_start_menu():
-    global game_state, character, player, picked_character
+    global game_state, character, player, picked_character, hovering_quit_b, hovering_start_b, hovering_tutorial_b
 
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -371,6 +394,21 @@ def detect_start_menu():
         # Quits the game
         elif screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
             sys.exit()
+    else:
+        if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
+            hovering_tutorial_b = True
+        else:
+            hovering_tutorial_b = False
+        
+        if screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
+            hovering_quit_b = True
+        else:
+            hovering_quit_b = False
+
+        if screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
+            hovering_start_b = True
+        else:
+            hovering_start_b = False
 
 # ----------------------------------- Shop -----------------------------------
 
@@ -408,18 +446,18 @@ def shop(mouse):
     # Character images and definitions
     theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (80, 80))
     normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png"), (80, 80))
-    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
     jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png"), (80, 80))
     normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png"), (80, 80))
-    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/jekyll_definition.png"), (450, 80))
     
     # Power-up images and definitions
     normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png"), (80, 80))
     med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png"), (80, 80))
-    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
     normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png"), (80, 80))
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png"), (80, 80))
-    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/quinn_definition.png"), (365 / 3, 190 / 3))
+    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
     
     # Sign
     text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
@@ -430,8 +468,8 @@ def shop(mouse):
     screen.blit(shop_bg, (screen_w * 0.1, 150))
     screen.blit(title1, (300, 185))
     screen.blit(title2, (800, 185))
-    screen.blit(normal_theresa, (175, 350))
-    screen.blit(normal_jekyll, (175, 450))
+    screen.blit(normal_theresa, (175, 250))
+    screen.blit(normal_jekyll, (175, 350))
     screen.blit(normal_med_kit, (screen_w / 2 + 50, 250))
     screen.blit(normal_speed_potion, (screen_w / 2 + 50, 350))
 
@@ -468,8 +506,8 @@ def shop(mouse):
     elif selected == "speed_potion":
         screen.blit(speed_potion, (screen_w / 2 + 50, 350))
 
-    screen.blit(theresa_def, (275, 355))
-    screen.blit(jekyll_def, (275, 455))
+    screen.blit(theresa_def, (275, 255))
+    screen.blit(jekyll_def, (275, 355))
     screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
     screen.blit(speed_potion_def, (screen_w / 2 + 150, 355))
     screen.blit(buy_button, (500, screen_h - 150))
@@ -522,23 +560,6 @@ def power_ups():
     else:
         screen.blit(grey_speed_potion, (screen_w - 100, 15))
 
-# Bullets
-class Bullet:
-    bullet_img = pygame.image.load('images/test_char.png')
-    def __init__(self, x, y, mouse): # pass in current character position
-        self.x = x
-        self.y = y
-        self.x2 = mouse[0]
-        self.y2 = mouse[1]
-        self.img = Bullet.bullet_img
-        self.area = pygame.Surface([10, 10])
-        self.rect = self.area.get_rect()
-        self.speed = 2
-        self.vdist = mouse[1] - y
-        self.hdist = mouse[0] - x
-
-    def update_pos(self, x, y, vx, vy):
-        Bullet.x += 2
 
 # Default character settings - player, position, speed
 player = John()
@@ -546,8 +567,8 @@ charX = screen_w / 2 - 18
 charY = screen_h / 2 - 28
 charX_change = 0
 charY_change = 0
-speed = -6
-diagspeed = -4
+speed = -5
+diagspeed = -3.5
 
 # Detects events during game play state
 def movement():
@@ -727,6 +748,114 @@ pygame.display.set_icon(logo)
 game_state = "start_menu" # start_menu, bg_story, game_play, or tutorial
 character = "John" # default character
 
+class Trail:
+    def __init__(self, x, y):
+        self.pos = (x, y)
+        self.frame_count = 0  # Add a frame count variable
+        self.max_frames = 50  # Set the maximum number of frames
+
+        self.trail = pygame.Surface((70, 70), pygame.SRCALPHA)
+        pygame.gfxdraw.aacircle(self.trail, 30, 30, 30, (50, 200, 50, 30))
+        pygame.gfxdraw.filled_circle(self.trail, 30, 30, 30, (50, 200, 50, 30))
+        self.speed = 0
+
+    def update(self):  
+        self.pos = (self.pos)
+        self.frame_count += 1
+        if self.frame_count >= self.max_frames:
+            trails.remove(self)  # Remove the trail after max_frames frames
+
+    def draw(self, surf):
+        trail_rect = self.trail.get_rect(center=self.pos)
+        surf.blit(self.trail, trail_rect) 
+
+trails = []
+timetotrail = 0
+trailspeed = 0
+
+def trailfunction():
+    global timetotrail
+    global trailspeed
+    pos = (charX+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), charY+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
+    if game_state == "game_play":
+        if timetotrail <= 1:
+            if picked_character == "Jekyll":
+                trails.append(Trail(*pos))
+                timetotrail = (trailspeed)
+
+    for trail in trails:
+        trail.update()  # Update the trail
+        trail.draw(screen)
+
+    timetotrail -= 1
+
+class Bullet:
+    def __init__(self, x, y):
+        self.pos = (x, y)
+        mx, my = pygame.mouse.get_pos()
+        self.dir = (mx - x, my - y)
+        length = math.hypot(*self.dir)
+        if length == 0.0:
+            self.dir = (0, -1)
+        else:
+            self.dir = (self.dir[0]/length, self.dir[1]/length)
+        angle = math.degrees(math.atan2(-self.dir[1], self.dir[0]))
+
+        self.bullet = pygame.Surface((15, 7)).convert_alpha()
+        self.bullet.fill((255, 255, 255))
+        self.bullet = pygame.transform.rotate(self.bullet, angle)
+        self.speed = 15
+
+    def update(self):  
+        self.pos = (self.pos[0]+self.dir[0]*self.speed, 
+                    self.pos[1]+self.dir[1]*self.speed)
+
+    def draw(self, surf):
+        bullet_rect = self.bullet.get_rect(center = self.pos)
+        surf.blit(self.bullet, bullet_rect)  
+
+bullets = []
+timetoshoot = 0
+attackspeed = 20
+
+def bulletfunction():
+    global timetoshoot
+    global attackspeed
+    pos = (charX+15, charY+35)
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_SPACE]:
+        if timetoshoot <= 1:
+            bullets.append(Bullet(*pos))
+            timetoshoot = (attackspeed)
+
+    for bullet in bullets[:]:
+        bullet.update()
+        if not screen.get_rect().collidepoint(bullet.pos):
+            bullets.remove(bullet)
+    for bullet in bullets:
+        bullet.draw(screen)
+    
+    timetoshoot -= 1
+
+
+# ----------------------------------- Special Abilities -----------------------------------
+
+global timetoregen
+timetoregen = 180
+
+def special():
+    global timetoregen
+
+    if picked_character == "Theresa":
+        timetoregen -= 1
+        if timetoregen == 0:
+            if player.health < 120:
+                player.health += 1
+            timetoregen = 180
+    
+    if picked_character == "Jekyll":
+        print("placeholder")
+
 # ----------------------------------- Main Loop of Game -----------------------------------
 
 running = True
@@ -759,6 +888,9 @@ while running:
         background_story()
     elif game_state == "game_play":
         play(shop_display, mouse)
+        bulletfunction()
+        trailfunction()
+        special()
     elif game_state == "game_over":
         game_over()
     elif game_state == "tutorial":
