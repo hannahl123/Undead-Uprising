@@ -654,8 +654,8 @@ def border():
         charY = screen_h - 60
 
 # Back button images
-back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
-h_back_button = pygame.transform.scale(pygame.image.load("images/h_BACK_button.png"), (510/4, 155/4))
+back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (130, 40))
+high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png"), (130, 40))
 
 # Game Play Function
 def play(shop_display, mouse):
@@ -666,7 +666,10 @@ def play(shop_display, mouse):
     screen.blit(test.zombie_full_health, (test.x, test.y))
     screen.blit(player.player_img, (charX, charY))
     bar(player.health, player.orig_health)
-    screen.blit(back_button, (screen_w - 510/4 - 30, screen_h - 155/4 - 30))
+    if screen_w - 160 <= mouse[0] <= screen_w - 30 and screen_h - 70 <= mouse[1] <= screen_h - 30:
+        screen.blit(high_back_button, (screen_w - 160, screen_h - 70))
+    else:
+        screen.blit(back_button, (screen_w - 160, screen_h - 70))
 
     # Character movement changes
     charX += charX_change
@@ -731,11 +734,18 @@ def background_story():
 
 # ----------------------------------- Tutorial -----------------------------------
 
-def tutorial():
+def tutorial(mouse):
+    global game_state
     tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png"), (screen_w, screen_h))
-    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4, 155/4))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (130, 40))
+    high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png"), (130, 40))
     screen.blit(tut, (0, 0))
     screen.blit(back_button, (screen_w - 200, screen_h - 100))
+    if screen_w - 200 <= mouse[0] <= screen_w - 70 and screen_h - 100 <= mouse[1] <= screen_h - 60:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            game_state = "start_menu"
+        else:
+            screen.blit(high_back_button, (screen_w - 200, screen_h - 100))
 
 # ----------------------------------- Game Details -----------------------------------
 
@@ -894,6 +904,6 @@ while running:
     elif game_state == "game_over":
         game_over()
     elif game_state == "tutorial":
-        tutorial()
+        tutorial(mouse)
     pygame.display.update()
     clock.tick(fps)
