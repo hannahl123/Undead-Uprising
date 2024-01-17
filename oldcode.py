@@ -15,7 +15,10 @@
 import pygame
 from pygame.locals import *
 from pygame import mixer
-import random, time, math, ctypes, sys
+import sys
+import ctypes
+import math
+import random
 import pygame.gfxdraw
 
 pygame.init()
@@ -31,18 +34,22 @@ fps = 60
 clock = pygame.time.Clock()
 
 # ---------------------------------------- Characters ----------------------------------------
-class John(pygame.sprite.Sprite):
+class John():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
-    h_john = pygame.image.load('images/characters/h_john.png')
     char_img = pygame.image.load('images/characters/john.png')
+    player_img = pygame.image.load('images/characters/player_john.png')
+    h_john = pygame.image.load('images/characters/h_john.png')
     clicked = False
     orig_health = 100
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = John.char_img
         self.health = 100
-        self.image = pygame.image.load('images/characters/player_john.png').convert_alpha()
-        self.rect = self.image.get_rect(center=(screen_w // 2, screen_h // 2))
+        self.player_img = John.player_img
+        self.area = pygame.Surface([35, 55])
+        self.rect = self.area.get_rect()
+        self.speed = 'normal'
 
     def show():
         if John.clicked:
@@ -50,24 +57,28 @@ class John(pygame.sprite.Sprite):
             John.music()
         else:
             screen.blit(John.char_img, (screen_w * 0.28, screen_h / 2 + 20))
-
+    
     def music():
         mixer.music.load('background_music/earth.mp3')
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-class Tony(pygame.sprite.Sprite):
+class Tony():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
-    h_tony = pygame.image.load('images/characters/h_tony.png')
     char_img = pygame.image.load('images/characters/tony.png')
+    player_img = pygame.image.load('images/characters/player_tony.png')
+    h_tony = pygame.image.load('images/characters/h_tony.png')
     clicked = False
     orig_health = 100
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = Tony.char_img
         self.health = 100
-        self.image = pygame.image.load('images/characters/player_tony.png').convert_alpha()
-        self.rect = self.image.get_rect(center=(screen_w // 2, screen_h // 2))
+        self.player_img = Tony.player_img
+        self.area = pygame.Surface([35, 55])
+        self.rect = self.area.get_rect()
+        self.speed = 'normal'
 
     def show():
         if Tony.clicked:
@@ -81,18 +92,22 @@ class Tony(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-class Swift(pygame.sprite.Sprite):
+class Swift():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_track.png'), (screen_w, screen_h))
-    h_swift = pygame.image.load('images/characters/h_swift.png')
     char_img = pygame.image.load('images/characters/swift.png')
+    player_img = pygame.image.load('images/characters/player_swift.png')
+    h_swift = pygame.image.load('images/characters/h_swift.png')
     clicked = False
     orig_health = 75
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = Swift.char_img
         self.health = 75
-        self.image = pygame.image.load('images/characters/player_swift.png').convert_alpha()
-        self.rect = self.image.get_rect()
+        self.player_img = Swift.player_img
+        self.area = pygame.Surface([35, 55])
+        self.rect = self.area.get_rect()
+        self.speed = 'fast'
 
     def show():
         if Swift.clicked:
@@ -106,18 +121,23 @@ class Swift(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-class Quinn(pygame.sprite.Sprite):
+class Quinn():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png'), (screen_w, screen_h))
-    h_quinn = pygame.image.load('images/characters/h_quinn.png')
     char_img = pygame.image.load('images/characters/quinn.png')
+    player_img = pygame.image.load('images/characters/player_quinn.png')
+    h_quinn = pygame.image.load('images/characters/h_quinn.png')
+    grey_quinn = pygame.image.load('images/characters/grey_quinn.png')
     clicked = False
     orig_health = 120
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = Quinn.char_img
         self.health = 120
-        self.image = pygame.image.load('images/characters/player_quinn.png').convert_alpha()
-        self.rect = self.image.get_rect()
+        self.player_img = Quinn.player_img
+        self.area = pygame.Surface([35, 55])
+        self.rect = self.area.get_rect()
+        self.speed = 'normal'
 
     def show():
         if Quinn.clicked:
@@ -131,19 +151,26 @@ class Quinn(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-class Theresa(pygame.sprite.Sprite):
+    def special():
+        screen.blit(logo, (0, 0))
+
+class Theresa():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_hospital.png'), (screen_w, screen_h))
-    h_theresa = pygame.image.load('images/characters/h_theresa.png')
     char_img = pygame.image.load('images/characters/theresa.png')
+    player_img = pygame.image.load('images/characters/player_theresa.png')
+    h_theresa = pygame.image.load('images/characters/h_theresa.png')
     grey_theresa = pygame.image.load('images/characters/grey_theresa.png')
     clicked = False
     orig_health = 120
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = Theresa.char_img
         self.health = 120
-        self.image = pygame.image.load('images/characters/player_theresa.png').convert_alpha()
-        self.rect = self.image.get_rect()
+        self.player_img = Theresa.player_img
+        self.area = pygame.Surface([37, 55])
+        self.rect = self.area.get_rect()
+        self.speed = 'normal'
 
     def show():
         if Theresa.clicked and shop_items["theresa"] == True:
@@ -159,29 +186,26 @@ class Theresa(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-    timetoregen = 180
-
     def special():
-        global timetoregen
-        timetoregen -= 1
-        if timetoregen == 0:
-            if player.health < 120:
-                player.health += 1
-            timetoregen = 180
+        screen.blit(logo, (0, 0))
 
-class Jekyll(pygame.sprite.Sprite):
+class Jekyll():
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_snow_ice.png'), (screen_w, screen_h))
     char_img = pygame.image.load('images/characters/jekyll.png')
+    player_img = pygame.image.load('images/characters/player_jekyll.png')
     h_jekyll = pygame.image.load('images/characters/h_jekyll.png')
     grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png')
     clicked = False
     orig_health = 120
 
     def __init__(self):
-        super().__init__()
+        self.clicked = False
+        self.img = Jekyll.char_img
         self.health = 120
-        self.image = pygame.image.load('images/characters/player_jekyll.png').convert_alpha()
-        self.rect = self.image.get_rect()
+        self.player_img = Jekyll.player_img
+        self.area = pygame.Surface([39, 59])
+        self.rect = self.area.get_rect()
+        self.speed = 'fast'
 
     def show():
         if Jekyll.clicked and shop_items["jekyll"] == True:
@@ -204,61 +228,58 @@ class Jekyll(pygame.sprite.Sprite):
 
 all_sprites = pygame.sprite.Group() 
 
-class Zombie(pygame.sprite.Sprite):
-
-    def __init__(self, target):
-        super().__init__()
-        self.health = 2
-        self.full_health_image = pygame.image.load("images/zombies/norm_zombie_full_health.png").convert_alpha()
-        self.half_health_image = pygame.image.load("images/zombies/norm_zombie_half_health.png").convert_alpha()
-        self.image = self.full_health_image
-        self.rect = self.image.get_rect()
-        self.target = target
-        self.speed = random.uniform(1, 3) # # Random speed between 1 and 3
+class normalZombie:
+    zombie_full_health = pygame.image.load('images/zombies/norm_zombie_full_health.png')
+    zombie_half_health = pygame.image.load('images/zombies/norm_zombie_half_health.png')
+    health = 2
+    x = 100
+    y = 100
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.health = normalZombie.health
+        self.full_health = normalZombie.zombie_full_health
+        self.half_health = normalZombie.zombie_half_health
+        self.area = pygame.Surface([35, 55])
+        self.rect = self.area.get_rect()
     
-    def update(self):
-        # Calculate direction towards the player
-        dx = self.target.rect.x - self.rect.x
-        dy = self.target.rect.y - self.rect.y
-        distance = math.sqrt(dx**2 + dy**2)
+    def show():
+        if normalZombie.health == 2:
+            screen.blit(normalZombie.zombie_full_health, (normalZombie.x, normalZombie.y))
+        elif normalZombie.health == 1:
+            screen.blit(normalZombie.zombie_half_health, (normalZombie.x, normalZombie.y))
+        else:
+            screen.blit(logo, (normalZombie.x, normalZombie.y))
 
-        # Move towards the player
-        if distance > 0:
-            self.rect.x += (dx / distance) * self.speed
-            self.rect.y += (dy / distance) * self.speed
+def generate():
+    randNum = random.randint(0, 3)
+    if randNum == 0: # appear from top border
+        randX, randY = random.randint(0, screen_w - 35), 100
+    elif randNum == 1: # appear from right border
+        randX, randY = screen_w - 35, random.randint(100, screen_h - 60)
+    elif randNum == 2: # appear from bottom border
+        randX, randY = random.randint(0, screen_w - 35), screen_h - 60
+    else: # appear from left border
+        randX, randY = screen_w - 35, random.randint(100, screen_h - 60)
+    zombie = normalZombie(randX, randY)
+    zombie.rect.x = zombie.x
+    zombie.rect.y = zombie.y
+    return zombie
 
-zombies = pygame.sprite.Group()
-
-def generate_zombie():
-    side = random.choice(["top", "bottom", "left", "right"])
-    if side == "top":
-        zombie = Zombie(player)
-        zombie.rect.x = random.randrange(screen_w - zombie.rect.width)
-        zombie.rect.y = 85
-    elif side == "bottom":
-        zombie = Zombie(player)
-        zombie.rect.x = random.randrange(screen_w - zombie.rect.width)
-        zombie.rect.y = screen_h - zombie.rect.height
-    elif side == "left":
-        zombie = Zombie(player)
-        zombie.rect.x = 0
-        zombie.rect.y = random.randint(85, screen_h - zombie.rect.height)
-    elif side == "right":
-        zombie = Zombie(player)
-        zombie.rect.x = screen_w - zombie.rect.width
-        zombie.rect.y = random.randint(85, screen_h - zombie.rect.height)
-
-    zombies.add(zombie)
-    all_sprites.add(zombie)
+test = generate()
 
 # ----------------------------------- Start Menu -----------------------------------
 
-def menu_music():
+"""bg_music = mixer.Sound('background_music/mainpage.mp3')
+bg_music.play(-1)
+mixer.music.set_volume(0.5)"""
+
+def music():
     mixer.music.load('background_music/mainpage.mp3')
     mixer.music.play(-1)
     mixer.music.set_volume(0.5)
 
-menu_music()
+music()
 
 hovering_tutorial_b, hovering_start_b, hovering_quit_b = False, False, False
 
@@ -302,9 +323,11 @@ def startMenu():
     Theresa.show()
     Jekyll.show()
 
+picked_character = ""
+
 # Detects events during start menu state
 def detect_start_menu():
-    global game_state, player, picked_character, hovering_quit_b, hovering_start_b, hovering_tutorial_b
+    global game_state, character, player, picked_character, hovering_quit_b, hovering_start_b, hovering_tutorial_b
 
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -540,13 +563,21 @@ def power_ups():
 
 # Default character settings - player, position, speed
 player = John()
+charX = screen_w / 2 - 18
+charY = screen_h / 2 - 28
+charX_change = 0
+charY_change = 0
+speed = -5
+diagspeed = -3.5
 
 # Detects events during game play state
-def detect_events():
+def movement():
     global charX, charY, charX_change, charY_change, mouse, game_state, player, speed, shop_display
-    
-    # Detects key pressed
     pressed = pygame.key.get_pressed()
+    # Detects key pressed
+    if pressed[pygame.K_b]:
+            shop_display = not shop_display
+
     if pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
        charX_change = 0
        charY_change = speed
@@ -599,10 +630,6 @@ def detect_events():
     if not pressed[pygame.K_s] and not pressed[pygame.K_w] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
        charX_change = 0
        charY_change = 0
-
-    # Detects shop button clicked
-    if pressed[pygame.K_b]:
-            shop_display = not shop_display
     
     # Detects back button clicked
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -616,68 +643,50 @@ def detect_events():
 
 # Creates a border around the screen that stops the character from moving out of screen
 def border():
-    if player.rect.x <= 5:
-        player.rect.x = 5
-    if player.rect.x >= screen_w - 38:
-        player.rect.x = screen_w - 38
-    if player.rect.y <= 85:
-        player.rect.y = 85
-    if player.rect.y >= screen_h - 60:
-        player.rect.y = screen_h - 60
+    global charX, charY, charX_change, charY_change
+    if charX <= 5:
+        charX = 5
+    if charX >= screen_w - 38:
+        charX = screen_w - 38
+    if charY <= 85:
+        charY = 85
+    if charY >= screen_h - 60:
+        charY = screen_h - 60
 
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (130, 40))
 high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png"), (130, 40))
 
-charX_change = 0
-charY_change = 0
-speed = -5
-diagspeed = -3.5
-
-last_zombie_time = time.time()
-zombie_generation_rate = 1
-
 # Game Play Function
 def play(shop_display, mouse):
-    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate
+    global player, charX, charY, charX_change, charY_change, game_state, clock, points
     border()
-
     # Basic screen set-up
     screen.blit(player.bg, (0, 80))
-
+    screen.blit(test.zombie_full_health, (test.x, test.y))
+    screen.blit(player.player_img, (charX, charY))
     bar(player.health, player.orig_health)
-
-    # Back Button
     if screen_w - 160 <= mouse[0] <= screen_w - 30 and screen_h - 70 <= mouse[1] <= screen_h - 30:
         screen.blit(high_back_button, (screen_w - 160, screen_h - 70))
     else:
         screen.blit(back_button, (screen_w - 160, screen_h - 70))
-    
-    # Player movement
-    keys = pygame.key.get_pressed()
-    
+
     # Character movement changes
-    player.rect.x += charX_change
-    player.rect.y += charY_change
+    charX += charX_change
+    charY += charY_change
+    player.rect.x = charX
+    player.rect.y = charY
 
-    # Generate zombies every 5 seconds
-    current_time = time.time()
-    time_elapsed = current_time - last_zombie_time
-    if time_elapsed >= 1 / zombie_generation_rate:
-        # Generate a zombie
-        generate_zombie()
-
-        # Update last zombie generation time
-        last_zombie_time = current_time
-
-        # Increase zombie generation rate over time
-        zombie_generation_rate += 0.0001
-
-    all_sprites.update()
+    all_sprites.update() 
     all_sprites.draw(screen)
-
-    if picked_character == "Theresa":
-        player.special()
+    
+    # Detect collision between character and zombie
+    collide = pygame.Rect.colliderect(player.rect, test.rect)
+    
+    if collide:
+        points += 1
+        player.health -= 1
+        print('collided')
 
     # Game end
     if player.health == 0:
@@ -709,7 +718,6 @@ def background_story():
     theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png"), (screen_w, screen_h))
     jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
     continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png"), (275, 40))
-    high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png"), (275, 40))
     if picked_character == "John":
         screen.blit(john, (0, 0))
     elif picked_character == "Tony":
@@ -722,10 +730,7 @@ def background_story():
         screen.blit(theresa, (0, 0))
     elif picked_character == "Jekyll":
         screen.blit(jekyll, (0, 0))
-    if screen_w - 350 <= mouse[0] <= screen_w - 75 and screen_h - 100 <= mouse[1] <= screen_h - 60:
-        screen.blit(high_continue_button, (screen_w - 350, screen_h - 100))   
-    else:
-        screen.blit(continue_button, (screen_w - 350, screen_h - 100))
+    screen.blit(continue_button, (screen_w - 350, screen_h - 100))   
 
 # ----------------------------------- Tutorial -----------------------------------
 
@@ -751,7 +756,7 @@ pygame.display.set_icon(logo)
 
 # State of game and character choice
 game_state = "start_menu" # start_menu, bg_story, game_play, or tutorial
-picked_character = "John" # Chosen character - defaulted John
+character = "John" # default character
 
 class Trail:
     def __init__(self, x, y):
@@ -781,7 +786,7 @@ trailspeed = 0
 def trailfunction():
     global timetotrail
     global trailspeed
-    pos = (player.rect.x+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), player.rect.y+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
+    pos = (charX+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), charY+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
     if game_state == "game_play":
         if timetotrail <= 1:
             if picked_character == "Jekyll":
@@ -794,43 +799,54 @@ def trailfunction():
 
     timetotrail -= 1
 
-# Bullet class
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, start_pos, target_pos):
-        super().__init__()
-        self.image = pygame.Surface((7, 7))
-        self.image.fill((255, 255, 255))
-        self.rect = self.image.get_rect(center=start_pos)
-        self.start_pos = start_pos
-        self.target_pos = target_pos
-        self.speed = 12
-    
-    def update(self):
-        # Move towards the target
-        direction = pygame.math.Vector2(self.target_pos) - pygame.math.Vector2(self.start_pos)
-        distance = direction.length()
-        if distance > 0:
-            direction.normalize_ip()
-            self.rect.x += direction.x * self.speed
-            self.rect.y += direction.y * self.speed
+class Bullet:
+    def __init__(self, x, y):
+        self.pos = (x, y)
+        mx, my = pygame.mouse.get_pos()
+        self.dir = (mx - x, my - y)
+        length = math.hypot(*self.dir)
+        if length == 0.0:
+            self.dir = (0, -1)
+        else:
+            self.dir = (self.dir[0]/length, self.dir[1]/length)
+        angle = math.degrees(math.atan2(-self.dir[1], self.dir[0]))
 
-            # Check for collisions with zombies
-            hits = pygame.sprite.spritecollide(self, zombies, False)
-            for zombie in hits:
-                zombie.health -= 1
-                if zombie.health == 1:
-                    zombie.image = zombie.half_health_image
-                elif zombie.health <= 0:
-                    zombie.kill()
-                self.kill()
+        self.bullet = pygame.Surface((15, 7)).convert_alpha()
+        self.bullet.fill((255, 255, 255))
+        self.bullet = pygame.transform.rotate(self.bullet, angle)
+        self.speed = 15
 
-            # Check if the bullet is outside the screen boundaries
-            if not pygame.Rect(0, 0, screen_w, screen_h).colliderect(self.rect):
-                self.kill()
+    def update(self):  
+        self.pos = (self.pos[0]+self.dir[0]*self.speed, 
+                    self.pos[1]+self.dir[1]*self.speed)
 
-bullets = pygame.sprite.Group()
+    def draw(self, surf):
+        bullet_rect = self.bullet.get_rect(center = self.pos)
+        surf.blit(self.bullet, bullet_rect)  
+
+bullets = []
 timetoshoot = 0
 attackspeed = 20
+
+def bulletfunction():
+    global timetoshoot
+    global attackspeed
+    pos = (charX+15, charY+35)
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_SPACE]:
+        if timetoshoot <= 1:
+            bullets.append(Bullet(*pos))
+            timetoshoot = (attackspeed)
+
+    for bullet in bullets[:]:
+        bullet.update()
+        if not screen.get_rect().collidepoint(bullet.pos):
+            bullets.remove(bullet)
+    for bullet in bullets:
+        bullet.draw(screen)
+    
+    timetoshoot -= 1
+
 
 # ----------------------------------- Special Abilities -----------------------------------
 
@@ -854,25 +870,22 @@ def special():
 
 running = True
 shop_display = False
-zombies_allowed = True
 
 while running:
     screen.fill((255, 255, 255))
     mouse = pygame.mouse.get_pos()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
             shop_display = not shop_display
-            zombies_allowed = not zombies_allowed
         if game_state == "start_menu":
             detect_start_menu()
         elif game_state == "bg_story":
             if event.type == pygame.MOUSEBUTTONDOWN and screen_w - 350 <= mouse[0] <= screen_w - 75 and screen_h - 100 <= mouse[1] <= screen_h - 60:
                 game_state = "game_play"
-                all_sprites.add(player)
         elif game_state == "game_play":
-            detect_events()
+            movement()
         elif game_state == "game_over":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 200 <= mouse[0] <= 525 and screen_h - 150 <= mouse[1] <= screen_h - 100:
@@ -885,18 +898,7 @@ while running:
         background_story()
     elif game_state == "game_play":
         play(shop_display, mouse)
-
-        # Bullet Detection
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_SPACE]:
-            if timetoshoot <= 1:
-                start_pos = player.rect.center
-                target_pos = pygame.mouse.get_pos()
-                bullet = Bullet(start_pos, target_pos)
-                bullets.add(bullet)
-                all_sprites.add(bullet)
-                timetoshoot = attackspeed
-        timetoshoot -= 1.5
+        bulletfunction()
         trailfunction()
         special()
     elif game_state == "game_over":
