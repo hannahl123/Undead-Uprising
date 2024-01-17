@@ -635,7 +635,7 @@ speed = -5
 diagspeed = -3.5
 
 last_zombie_time = time.time()
-zombie_generation_rate = 1
+zombie_generation_rate = 0.25
 
 # Game Play Function
 def play(shop_display, mouse):
@@ -671,7 +671,7 @@ def play(shop_display, mouse):
         last_zombie_time = current_time
 
         # Increase zombie generation rate over time
-        zombie_generation_rate += 0.0001
+        zombie_generation_rate += 0.01
 
     all_sprites.update()
     all_sprites.draw(screen)
