@@ -320,6 +320,7 @@ def detect_start_menu():
     if event.type == pygame.MOUSEBUTTONDOWN:
         # Sets player to character clicked
         if screen_w * 0.28 <= mouse[0] <= screen_w * 0.28 + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = John()
             picked_character = "John"
             if John.clicked:
@@ -328,6 +329,7 @@ def detect_start_menu():
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = True, False, False, False, False, False
             print('John is picked')
         elif screen_w * (0.28 + 0.077) <= mouse[0] <= screen_w * (0.28 + 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = Tony()
             picked_character =  "Tony"
             if Tony.clicked:
@@ -336,6 +338,7 @@ def detect_start_menu():
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, True, False, False, False, False
             print('Tony is picked')
         elif screen_w * (0.28 + 2 * 0.077) <= mouse[0] <= screen_w * (0.28 + 2 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = Swift()
             picked_character = "Swift"
             if Swift.clicked:
@@ -344,6 +347,7 @@ def detect_start_menu():
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, True, False, False, False
             print('Swift is picked')
         elif screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = Quinn()
             picked_character = "Quinn"
             if Quinn.clicked:
@@ -353,6 +357,7 @@ def detect_start_menu():
             print('Quinn is picked')
         # Special characters
         elif shop_items["theresa"] == True and screen_w * (0.28 + 4 * 0.077) <= mouse[0] <= screen_w * (0.28 + 4 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = Theresa()
             picked_character = "Theresa"
             if Theresa.clicked:
@@ -361,6 +366,7 @@ def detect_start_menu():
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, False, False, True, False
             print('Theresa is picked')
         elif shop_items["jekyll"] == True and screen_w * (0.28 + 5 * 0.077) <= mouse[0] <= screen_w * (0.28 + 5 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+            all_sprites.remove(player)
             player = Jekyll()
             picked_character = "Jekyll"
             if Jekyll.clicked:
@@ -418,7 +424,7 @@ costs = {
 selected = ""
 
 def shop(mouse):
-    global selected, shop_display, points
+    global selected, shop_display, points, zombies_allowed
 
     # Images, text, etc.
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
@@ -479,10 +485,12 @@ def shop(mouse):
                 points -= costs[selected]
                 selected = "buy"
                 shop_display = not shop_display
+                zombies_allowed = not zombies_allowed
             else:
                 screen.blit(text, (screen_w / 2 - text.get_width() / 2, screen_h / 2))
         elif screen_w - 600 <= mouse[0] <= screen_w - 600 + 510/4.5 and screen_h - 150 <= mouse[1] <= screen_h - 150 + 155/4.5:
             shop_display = not shop_display
+            zombies_allowed = not zombies_allowed
 
     if selected == "theresa":
         screen.blit(theresa, (175, 350))
@@ -653,19 +661,6 @@ def play(shop_display, mouse):
     global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed
     border()
 
-    # Basic screen set-up
-    screen.blit(player.bg, (0, 80))
-    bar(player.health, player.orig_health)
-
-    # Back Button
-    if screen_w - 160 <= mouse[0] <= screen_w - 30 and screen_h - 70 <= mouse[1] <= screen_h - 30:
-        screen.blit(high_back_button, (screen_w - 160, screen_h - 70))
-    else:
-        screen.blit(back_button, (screen_w - 160, screen_h - 70))
-    
-    # Player movement
-    keys = pygame.key.get_pressed()
-    
     # Character movement changes
     player.rect.x += charX_change
     player.rect.y += charY_change
@@ -692,7 +687,7 @@ def play(shop_display, mouse):
                 player_health_decrease_timer = current_time
 
         all_sprites.update()
-        all_sprites.draw(screen)
+    all_sprites.draw(screen)
 
     if picked_character == "Theresa":
         player.special()
@@ -700,10 +695,7 @@ def play(shop_display, mouse):
     # Game end
     if player.health == 0:
         game_state = 'game_over'
-    
-    # Display shop screen
-    if shop_display:
-        shop(mouse)
+
 
 def game_over():
     # Images
@@ -904,9 +896,6 @@ while running:
                 all_sprites.add(player)
         elif game_state == "game_play":
             detect_events()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                zombies_allowed = not zombies_allowed
-                paused = not paused
         elif game_state == "game_over":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 200 <= mouse[0] <= 525 and screen_h - 150 <= mouse[1] <= screen_h - 100:
@@ -919,6 +908,10 @@ while running:
     elif game_state == "bg_story":
         background_story()
     elif game_state == "game_play":
+        # Basic screen set-up
+        screen.blit(player.bg, (0, 80))
+        bar(player.health, player.orig_health)
+        
         if zombies_allowed:
             play(shop_display, mouse)
 
@@ -935,8 +928,16 @@ while running:
             timetoshoot -= 1.5
             trailfunction()
             special()
-        elif paused:
-            screen.blit(paused_screen, (0, 0))
+        
+        # Display shop screen
+        if shop_display:
+            shop(mouse)
+
+        # Back Button
+        if screen_w - 160 <= mouse[0] <= screen_w - 30 and screen_h - 70 <= mouse[1] <= screen_h - 30:
+            screen.blit(high_back_button, (screen_w - 160, screen_h - 70))
+        else:
+            screen.blit(back_button, (screen_w - 160, screen_h - 70))
     elif game_state == "game_over":
         game_over()
     elif game_state == "tutorial":
