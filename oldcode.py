@@ -786,7 +786,7 @@ trailspeed = 0
 def trailfunction():
     global timetotrail
     global trailspeed
-    pos = (charX+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), charY+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
+    pos = (player.rect.x+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), player.rect.y+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
     if game_state == "game_play":
         if timetotrail <= 1:
             if picked_character == "Jekyll":
