@@ -658,7 +658,7 @@ player_health_decrease_timer = time.time()
 
 # Game Play Function
 def play(shop_display, mouse):
-    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed
+    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc
     border()
 
     # Character movement changes
@@ -677,7 +677,8 @@ def play(shop_display, mouse):
             last_zombie_time = current_time
 
             # Increase zombie generation rate over time
-            zombie_generation_rate += 0.01
+            zombie_generation_rate += 0.005
+            acc += 0.0005
 
         hits = pygame.sprite.spritecollide(player, zombies, False)
         for zombie in hits:
@@ -864,12 +865,14 @@ def special():
         print("placeholder")
 
 def resetGame():
-    global all_sprites, zombies, trails, bullets, player
+    global all_sprites, zombies, trails, bullets, player, zombie_generation_rate, acc
     player.__init__()
     all_sprites = pygame.sprite.Group()
     zombies = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
     trails = pygame.sprite.Group()
+    zombie_generation_rate = 0.25
+    acc = 0
 
 # ----------------------------------- Main Loop of Game -----------------------------------
 
@@ -878,6 +881,7 @@ shop_display = False
 zombies_allowed = True
 paused = False
 paused_screen = pygame.transform.scale(pygame.image.load("images/paused_screen.png"), (screen_w, screen_h))
+acc = 0
 
 while running:
     screen.fill((255, 255, 255))
@@ -918,7 +922,7 @@ while running:
             # Bullet Detection
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_SPACE]:
-                if timetoshoot <= 1:
+                if timetoshoot <= abs(1 - acc):
                     start_pos = player.rect.center
                     target_pos = pygame.mouse.get_pos()
                     bullet = Bullet(start_pos, target_pos)
