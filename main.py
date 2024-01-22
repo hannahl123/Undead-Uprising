@@ -1,16 +1,20 @@
-# All code for Undead Uprising - Updated as of Jan 14, 2024
-# Note that the table of contents may be slightly out of date - just gives you an overall idea of where each part is
-# Lines 1 - 30 Basic Setup of Game Screen Settings (libraries, init, size)
-# Lines 31 - 187 Character Classes (attributes, functions, etc.)
-# Lines 188 - 236 Zombie Classes and Generating
-# Lines 237 - 338 Start Menu
-# Lines 339 - 466 Shop
-# Lines 467 - ??? Power-ups
-# Lines 467 - 686 Game Play Functions (game over, movement detection, top bar, border, health bar, back button, etc.)
-# Lines 687 - 711 Background Stories
-# Lines 712 - 719 Tutorial
-# Lines 720 - 730 Game Details (logo, title, character, state)
-# Lines 731 - 765 Main Loop of Game (while loop, time, fps, etc.)
+# Undead Uprising
+# Updated as of January 22, 2024
+# Lines 15 - 27 Imports and Initialization
+# Lines 28 - 80 Game Settings and Details
+# Lines 81 - 86 Sprite Groups
+# Lines 87 - 300 Character Classes
+# Lines 301 - 371 Zombie Classes and Auto-generation
+# Lines 372 - 400 Background Stories
+# Lines 401 - 540 Start Menu
+# Line 541 - 555 Tutorial
+# Lines 556 - 660 Shop
+# Lines 661 - 883 Game Play Functions (top menu bar, movement, reset character stats, game over, etc.)
+# Lines 884 - 922 Bullet Shooting
+# LInes 923 - 933 Reset Game After Round
+# Lines 934 - 1008 Main Loop of Game
+
+# ----------------------------------- Imports and Initialization -----------------------------------
 
 import pygame
 from pygame.locals import *
@@ -21,19 +25,67 @@ import pygame.gfxdraw
 pygame.init()
 mixer.init()
 
-
-# ---------------------------------------- Screen Settings ----------------------------------------
+# ----------------------------------- Game Settings and Global Variables -----------------------------------
 
 # Setting size of screen to full screen
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 screen_w, screen_h = true_res[0], true_res[1]
 screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
+
+# Setting the game name and logo
+pygame.display.set_caption("Undead Uprising")
+logo = pygame.image.load('images/test_char.png').convert_alpha()
+pygame.display.set_icon(logo)
+
+# Font, Time, and Control Variables
 font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
 fps = 60
 clock = pygame.time.Clock()
-zombies = pygame.sprite.Group()
+shop_display = False
+zombies_allowed = True
+paused = False
+paused_screen = pygame.transform.scale(pygame.image.load("images/paused_screen.png").convert_alpha(), (screen_w, screen_h))
+acc = 0
+hovering_tutorial_b = False
+hovering_start_b = False
+hovering_quit_b = False
 
-# ---------------------------------------- Characters ----------------------------------------
+# Character speed variables
+extraspeed = 0
+extraspeed_duration = 300
+extraspeed_timer = 0
+# diagspeed = 0
+charX_change = 0
+charY_change = 0
+speed = -5
+diagspeed = -3.5
+
+# Zombie generation time variables
+last_zombie_time = time.time()
+zombie_generation_rate = 0.25
+player_health_decrease_timer = time.time()
+
+# Back button images
+back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
+high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
+
+# Bullet variables
+timetoshoot = 0
+attackspeed = 20
+
+# Jekyll's trail variables
+trails = []
+timetotrail = 0
+trailspeed = 0
+
+# ----------------------------------- Sprite Groups -----------------------------------
+
+all_sprites = pygame.sprite.Group() 
+zombies = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+
+# ----------------------------------- Character Classes -----------------------------------
+
 class John(pygame.sprite.Sprite):
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
     h_john = pygame.image.load('images/characters/h_john.png').convert_alpha()
@@ -198,9 +250,55 @@ class Jekyll(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-# ---------------------------------------- Zombies ----------------------------------------
+# Jekyll's special trail feature
+class Trail:
+    def __init__(self, x, y):
+        self.pos = (x, y)
+        self.frame_count = 0  # Add a frame count variable
+        self.max_frames = 50  # Set the maximum number of frames
 
-all_sprites = pygame.sprite.Group() 
+        self.trail = pygame.Surface((70, 70), pygame.SRCALPHA)
+        pygame.gfxdraw.aacircle(self.trail, 30, 30, 30, (50, 200, 50, 30))
+        pygame.gfxdraw.filled_circle(self.trail, 30, 30, 30, (50, 200, 50, 30))
+        self.speed = 0
+
+    def update(self):  
+        self.pos = (self.pos)
+        self.frame_count += 1
+        if self.frame_count >= self.max_frames:
+            trails.remove(self)  # Remove the trail after max_frames frames
+
+    def draw(self, surf):
+        trail_rect = self.trail.get_rect(center=self.pos)
+        surf.blit(self.trail, trail_rect) 
+
+def trailfunction():
+    global timetotrail
+    global trailspeed
+    pos = (player.rect.x+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), player.rect.y+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
+    if game_state == "game_play":
+        if timetotrail <= 1:
+            if picked_character == "Jekyll":
+                trails.append(Trail(*pos))
+                timetotrail = (trailspeed)
+
+    for trail in trails:
+        trail.update()  # Update the trail
+        trail.draw(screen)
+
+    timetotrail -= 1
+
+def detect_collision(zombies, trails):
+    for zombie in zombies:
+        for trail in trails:
+            if zombie.rect.colliderect(trail.trail.get_rect(center=trail.pos)):
+                zombie.health -= 0.0005
+                if zombie.health <= 1 and not zombie.health <= 0:
+                    zombie.image = zombie.half_health_image
+                elif zombie.health <= 0:
+                    zombie.kill()
+
+# ----------------------------------- Zombie Classes and Auto-generation -----------------------------------
 
 class shieldZombie(pygame.sprite.Sprite):
 
@@ -248,6 +346,7 @@ class Zombie(pygame.sprite.Sprite):
             self.rect.x += (dx / distance) * self.speed
             self.rect.y += (dy / distance) * self.speed
 
+# Generates zombie randomly around the border of the screen
 def generate_zombie():
     side = random.choice(["top", "bottom", "left", "right"])
     if side == "top":
@@ -270,6 +369,35 @@ def generate_zombie():
     zombies.add(zombie)
     all_sprites.add(zombie)
 
+# ----------------------------------- Background Stories -----------------------------------
+            
+def background_story():
+    global picked_character
+    john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
+    tony = pygame.transform.scale(pygame.image.load("images/back_stories/Tony_backstory.png").convert_alpha(), (screen_w, screen_h))
+    swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png").convert_alpha(), (screen_w, screen_h))
+    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png").convert_alpha(), (screen_w, screen_h))
+    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png").convert_alpha(), (screen_w, screen_h))
+    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
+    continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png").convert_alpha(), (275, 40))
+    high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png").convert_alpha(), (275, 40))
+    if picked_character == "John":
+        screen.blit(john, (0, 0))
+    elif picked_character == "Tony":
+        screen.blit(tony, (0, 0))
+    elif picked_character == "Swift":
+        screen.blit(swift, (0, 0))
+    elif picked_character == "Quinn":
+        screen.blit(quinn, (0, 0))
+    elif picked_character == "Theresa":
+        screen.blit(theresa, (0, 0))
+    elif picked_character == "Jekyll":
+        screen.blit(jekyll, (0, 0))
+    if screen_w - 350 <= mouse[0] <= screen_w - 75 and screen_h - 100 <= mouse[1] <= screen_h - 60:
+        screen.blit(high_continue_button, (screen_w - 350, screen_h - 100))   
+    else:
+        screen.blit(continue_button, (screen_w - 350, screen_h - 100))
+
 # ----------------------------------- Start Menu -----------------------------------
 
 def menu_music():
@@ -278,8 +406,6 @@ def menu_music():
     mixer.music.set_volume(0.5)
 
 menu_music()
-
-hovering_tutorial_b, hovering_start_b, hovering_quit_b = False, False, False
 
 def startMenu():
     global hovering_quit_b, hovering_start_b, hovering_tutorial_b
@@ -412,6 +538,21 @@ def detect_start_menu():
         else:
             hovering_start_b = False
 
+# ----------------------------------- Tutorial -----------------------------------
+
+def tutorial(mouse):
+    global game_state
+    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png").convert_alpha(), (screen_w, screen_h))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
+    high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
+    screen.blit(tut, (0, 0))
+    screen.blit(back_button, (screen_w - 200, screen_h - 100))
+    if screen_w - 200 <= mouse[0] <= screen_w - 70 and screen_h - 100 <= mouse[1] <= screen_h - 60:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            game_state = "start_menu"
+        else:
+            screen.blit(high_back_button, (screen_w - 200, screen_h - 100))
+
 # ----------------------------------- Shop -----------------------------------
 
 points = 16000
@@ -519,7 +660,7 @@ def shop(mouse):
 
 # ----------------------------------- Game Play -----------------------------------
 
-# Top bar
+# Top menu bar (displays player health, points, and power-ups)
 def bar(health, orig_health):
     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, screen_w, 80))
     draw_health_bar(health, orig_health)
@@ -564,15 +705,7 @@ def power_ups():
     else:
         screen.blit(grey_speed_potion, (screen_w - 100, 15))
 
-
-# Default character settings - player, position, speed
-player = John()
-
-extraspeed = 0
-extraspeed_duration = 300
-extraspeed_timer = 0
-diagspeed = 0
-
+# Sets character movement speed
 def setspeed():
     global speed, diagspeed, extraspeed
     if picked_character == "John" or picked_character == "Quinn" or picked_character == "Theresa" or picked_character == "Jekyll":
@@ -580,7 +713,7 @@ def setspeed():
     if picked_character == "Tony":
         speed = -4
     if picked_character == "Swift":
-        speed = -7
+        speed = -6
     if extraspeed == 1:
         speed -= 3
     
@@ -593,6 +726,7 @@ def detect_events():
     # Detects key pressed
     pressed = pygame.key.get_pressed()
 
+    # Medicine kit Power-up
     if pressed[pygame.K_q]:
         if shop_items['med_kit'] == True:
             healthdiff = player.orig_health - player.health
@@ -603,6 +737,7 @@ def detect_events():
             
         shop_items['med_kit'] = False
 
+    # Speed potion Power-up
     if pressed[pygame.K_e]:
         if shop_items['speed_potion']:
             extraspeed = 1
@@ -615,6 +750,7 @@ def detect_events():
     else:
         extraspeed = 0
 
+    # Character movement detection
     if pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
        charX_change = 0
        charY_change = speed
@@ -693,19 +829,6 @@ def border():
     if player.rect.y >= screen_h - 60:
         player.rect.y = screen_h - 60
 
-# Back button images
-back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
-high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
-
-charX_change = 0
-charY_change = 0
-speed = -5
-diagspeed = -3.5
-
-last_zombie_time = time.time()
-zombie_generation_rate = 0.25
-player_health_decrease_timer = time.time()
-
 # Game Play Function
 def play(shop_display, mouse):
     global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc
@@ -747,7 +870,6 @@ def play(shop_display, mouse):
     if player.health == 0:
         game_state = 'game_over'
 
-
 def game_over():
     # Images
     game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png").convert_alpha(), (screen_w, screen_h))
@@ -759,113 +881,9 @@ def game_over():
     screen.blit(try_again, (200, screen_h - 150))
     screen.blit(quit, (screen_w - 500, screen_h - 175))
 
-# ----------------------------------- Background Stories -----------------------------------
-            
-def background_story():
-    global picked_character
-    john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
-    tony = pygame.transform.scale(pygame.image.load("images/back_stories/Tony_backstory.png").convert_alpha(), (screen_w, screen_h))
-    swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png").convert_alpha(), (screen_w, screen_h))
-    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png").convert_alpha(), (screen_w, screen_h))
-    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png").convert_alpha(), (screen_w, screen_h))
-    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
-    continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png").convert_alpha(), (275, 40))
-    high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png").convert_alpha(), (275, 40))
-    if picked_character == "John":
-        screen.blit(john, (0, 0))
-    elif picked_character == "Tony":
-        screen.blit(tony, (0, 0))
-    elif picked_character == "Swift":
-        screen.blit(swift, (0, 0))
-    elif picked_character == "Quinn":
-        screen.blit(quinn, (0, 0))
-    elif picked_character == "Theresa":
-        screen.blit(theresa, (0, 0))
-    elif picked_character == "Jekyll":
-        screen.blit(jekyll, (0, 0))
-    if screen_w - 350 <= mouse[0] <= screen_w - 75 and screen_h - 100 <= mouse[1] <= screen_h - 60:
-        screen.blit(high_continue_button, (screen_w - 350, screen_h - 100))   
-    else:
-        screen.blit(continue_button, (screen_w - 350, screen_h - 100))
+# ----------------------------------- Bullet Shooting -----------------------------------
 
-# ----------------------------------- Tutorial -----------------------------------
-
-def tutorial(mouse):
-    global game_state
-    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png").convert_alpha(), (screen_w, screen_h))
-    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
-    high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
-    screen.blit(tut, (0, 0))
-    screen.blit(back_button, (screen_w - 200, screen_h - 100))
-    if screen_w - 200 <= mouse[0] <= screen_w - 70 and screen_h - 100 <= mouse[1] <= screen_h - 60:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            game_state = "start_menu"
-        else:
-            screen.blit(high_back_button, (screen_w - 200, screen_h - 100))
-
-# ----------------------------------- Game Details -----------------------------------
-
-# Setting the game name and logo
-pygame.display.set_caption("Undead Uprising")
-logo = pygame.image.load('images/test_char.png').convert_alpha()
-pygame.display.set_icon(logo)
-
-# State of game and character choice
-game_state = "start_menu" # start_menu, bg_story, game_play, or tutorial
-picked_character = "John" # Chosen character - defaulted John
-
-class Trail:
-    def __init__(self, x, y):
-        self.pos = (x, y)
-        self.frame_count = 0  # Add a frame count variable
-        self.max_frames = 50  # Set the maximum number of frames
-
-        self.trail = pygame.Surface((70, 70), pygame.SRCALPHA)
-        pygame.gfxdraw.aacircle(self.trail, 30, 30, 30, (50, 200, 50, 30))
-        pygame.gfxdraw.filled_circle(self.trail, 30, 30, 30, (50, 200, 50, 30))
-        self.speed = 0
-
-    def update(self):  
-        self.pos = (self.pos)
-        self.frame_count += 1
-        if self.frame_count >= self.max_frames:
-            trails.remove(self)  # Remove the trail after max_frames frames
-
-    def draw(self, surf):
-        trail_rect = self.trail.get_rect(center=self.pos)
-        surf.blit(self.trail, trail_rect) 
-
-trails = []
-timetotrail = 0
-trailspeed = 0
-
-def trailfunction():
-    global timetotrail
-    global trailspeed
-    pos = (player.rect.x+20+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]), player.rect.y+54+random.choice([-5,-4,-3,-2,-1,0,1,2,3,4,5]))
-    if game_state == "game_play":
-        if timetotrail <= 1:
-            if picked_character == "Jekyll":
-                trails.append(Trail(*pos))
-                timetotrail = (trailspeed)
-
-    for trail in trails:
-        trail.update()  # Update the trail
-        trail.draw(screen)
-
-    timetotrail -= 1
-
-def detect_collision(zombies, trails):
-    for zombie in zombies:
-        for trail in trails:
-            if zombie.rect.colliderect(trail.trail.get_rect(center=trail.pos)):
-                zombie.health -= 0.0005
-                if zombie.health <= 1 and not zombie.health <= 0:
-                    zombie.image = zombie.half_health_image
-                elif zombie.health <= 0:
-                    zombie.kill()
-
-# Bullet class
+# Bullet object class
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, start_pos, target_pos):
         super().__init__()
@@ -902,24 +920,7 @@ class Bullet(pygame.sprite.Sprite):
             if not pygame.Rect(0, 0, screen_w, screen_h).colliderect(self.rect):
                 self.kill()
 
-bullets = pygame.sprite.Group()
-timetoshoot = 0
-attackspeed = 20
-
-# ----------------------------------- Special Abilities -----------------------------------
-
-global timetoregen
-timetoregen = 180
-
-def special():
-    global timetoregen
-
-    if picked_character == "Theresa":
-        timetoregen -= 1
-        if timetoregen == 0:
-            if player.health < 120:
-                player.health += 1
-            timetoregen = 180
+# ----------------------------------- Reset Game After Round -----------------------------------
 
 def resetGame():
     global all_sprites, zombies, trails, bullets, player, zombie_generation_rate, acc
@@ -927,18 +928,17 @@ def resetGame():
     all_sprites = pygame.sprite.Group()
     zombies = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
-    trails = pygame.sprite.Group()
     zombie_generation_rate = 0.25
     acc = 0
 
 # ----------------------------------- Main Loop of Game -----------------------------------
 
+# Setting the game state and default character choice
+game_state = "start_menu" # start_menu, bg_story, game_play, or tutorial
+picked_character = "John" # Chosen character - defaulted John
+player = John() # Default character
+
 running = True
-shop_display = False
-zombies_allowed = True
-paused = False
-paused_screen = pygame.transform.scale(pygame.image.load("images/paused_screen.png").convert_alpha(), (screen_w, screen_h))
-acc = 0
 
 while running:
     screen.fill((255, 255, 255))
@@ -990,7 +990,6 @@ while running:
             timetoshoot -= 1.5
             trailfunction()
             detect_collision(zombies, trails)
-            special()
         
         # Display shop screen
         if shop_display:
