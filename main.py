@@ -35,9 +35,9 @@ zombies = pygame.sprite.Group()
 
 # ---------------------------------------- Characters ----------------------------------------
 class John(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
-    h_john = pygame.image.load('images/characters/h_john.png')
-    char_img = pygame.image.load('images/characters/john.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
+    h_john = pygame.image.load('images/characters/h_john.png').convert_alpha()
+    char_img = pygame.image.load('images/characters/john.png').convert_alpha()
     clicked = False
     orig_health = 100
 
@@ -57,12 +57,11 @@ class John(pygame.sprite.Sprite):
     def music():
         mixer.music.load('background_music/earth.mp3')
         mixer.music.play(-1)
-        mixer.music.set_volume(0.5)
 
 class Tony(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
-    h_tony = pygame.image.load('images/characters/h_tony.png')
-    char_img = pygame.image.load('images/characters/tony.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
+    h_tony = pygame.image.load('images/characters/h_tony.png').convert_alpha()
+    char_img = pygame.image.load('images/characters/tony.png').convert_alpha()
     clicked = False
     orig_health = 100
 
@@ -85,9 +84,9 @@ class Tony(pygame.sprite.Sprite):
         mixer.music.set_volume(0.5)
 
 class Swift(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_track.png'), (screen_w, screen_h))
-    h_swift = pygame.image.load('images/characters/h_swift.png')
-    char_img = pygame.image.load('images/characters/swift.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_track.png').convert_alpha(), (screen_w, screen_h))
+    h_swift = pygame.image.load('images/characters/h_swift.png').convert_alpha()
+    char_img = pygame.image.load('images/characters/swift.png').convert_alpha()
     clicked = False
     orig_health = 75
 
@@ -110,9 +109,9 @@ class Swift(pygame.sprite.Sprite):
         mixer.music.set_volume(0.5)
 
 class Quinn(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png'), (screen_w, screen_h))
-    h_quinn = pygame.image.load('images/characters/h_quinn.png')
-    char_img = pygame.image.load('images/characters/quinn.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png').convert_alpha(), (screen_w, screen_h))
+    h_quinn = pygame.image.load('images/characters/h_quinn.png').convert_alpha()
+    char_img = pygame.image.load('images/characters/quinn.png').convert_alpha()
     clicked = False
     orig_health = 120
 
@@ -135,10 +134,10 @@ class Quinn(pygame.sprite.Sprite):
         mixer.music.set_volume(0.5)
 
 class Theresa(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_hospital.png'), (screen_w, screen_h))
-    h_theresa = pygame.image.load('images/characters/h_theresa.png')
-    char_img = pygame.image.load('images/characters/theresa.png')
-    grey_theresa = pygame.image.load('images/characters/grey_theresa.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_hospital.png').convert_alpha(), (screen_w, screen_h))
+    h_theresa = pygame.image.load('images/characters/h_theresa.png').convert_alpha()
+    char_img = pygame.image.load('images/characters/theresa.png').convert_alpha()
+    grey_theresa = pygame.image.load('images/characters/grey_theresa.png').convert_alpha()
     clicked = False
     orig_health = 120
 
@@ -172,10 +171,10 @@ class Theresa(pygame.sprite.Sprite):
             Theresa.timetoregen = 180
 
 class Jekyll(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_snow_ice.png'), (screen_w, screen_h))
-    char_img = pygame.image.load('images/characters/jekyll.png')
-    h_jekyll = pygame.image.load('images/characters/h_jekyll.png')
-    grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_snow_ice.png').convert_alpha(), (screen_w, screen_h))
+    char_img = pygame.image.load('images/characters/jekyll.png').convert_alpha()
+    h_jekyll = pygame.image.load('images/characters/h_jekyll.png').convert_alpha()
+    grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png').convert_alpha()
     clicked = False
     orig_health = 120
 
@@ -199,22 +198,32 @@ class Jekyll(pygame.sprite.Sprite):
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
-# Jekyll's special trail function
-
-trails = pygame.sprite.Group()
-
-class Trail(pygame.sprite.Sprite):
-    def __init__(self, start_pos):
-        super().__init__()
-        self.image = pygame.Surface((10, 10))
-        self.image.fill((255, 0, 255))
-        self.rect = self.image.get_rect(center=start_pos)
-        self.start_pos = start_pos
-        self.speed = 5
-
 # ---------------------------------------- Zombies ----------------------------------------
 
 all_sprites = pygame.sprite.Group() 
+
+class shieldZombie(pygame.sprite.Sprite):
+
+    def __init__(self, target):
+        super().__init__()
+        self.health = 3
+        self.full_health_image = pygame.image.load("images/zombies/shield_zombie_full_health.png").convert_alpha()
+        self.half_health_image = pygame.image.load("images/zombies/shield_zombie_half_health.png").convert_alpha()
+        self.image = self.full_health_image
+        self.rect = self.image.get_rect()
+        self.target = target
+        self.speed = random.uniform(2, 4) # # Random speed between 1 and 3
+    
+    def update(self):
+        # Calculate direction towards the player
+        dx = self.target.rect.x - self.rect.x
+        dy = self.target.rect.y - self.rect.y
+        distance = math.sqrt(dx**2 + dy**2)
+
+        # Move towards the player
+        if distance > 0:
+            self.rect.x += (dx / distance) * self.speed
+            self.rect.y += (dy / distance) * self.speed
 
 class Zombie(pygame.sprite.Sprite):
 
@@ -275,16 +284,16 @@ hovering_tutorial_b, hovering_start_b, hovering_quit_b = False, False, False
 def startMenu():
     global hovering_quit_b, hovering_start_b, hovering_tutorial_b
     # Images and Text
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png'), (screen_w, screen_h))
-    title_img = pygame.image.load('images/UNDEAD UPRISING.png')
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
+    title_img = pygame.image.load('images/UNDEAD UPRISING.png').convert_alpha()
     text = font.render('Pick your character', True, (255, 255, 255))
-    border = pygame.transform.scale(pygame.image.load('images/border.png'), (700, 200))
-    tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png'), (115, 115))
-    start_b = pygame.transform.scale(pygame.image.load('images/START_button.png'), (150, 60))
-    quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png'), (150, 60))
-    high_tutorial_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_TUTORIAL_button.png'), (115, 115))
-    high_start_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_START_button.png'), (150, 60))
-    high_quit_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_QUIT_button.png'), (150, 60))
+    border = pygame.transform.scale(pygame.image.load('images/border.png').convert_alpha(), (700, 200))
+    tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png').convert_alpha(), (115, 115))
+    start_b = pygame.transform.scale(pygame.image.load('images/START_button.png').convert_alpha(), (150, 60))
+    quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png').convert_alpha(), (150, 60))
+    high_tutorial_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_TUTORIAL_button.png').convert_alpha(), (115, 115))
+    high_start_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_START_button.png').convert_alpha(), (150, 60))
+    high_quit_b = pygame.transform.scale(pygame.image.load('images/highlighted_buttons/highlighted_QUIT_button.png').convert_alpha(), (150, 60))
 
     # Display images, text and buttons
     screen.blit(bg, (0, 0)) # background
@@ -405,7 +414,7 @@ def detect_start_menu():
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 1600
+points = 16000
 
 shop_items = {
     "theresa" : False, 
@@ -430,27 +439,27 @@ def shop(mouse):
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
     title1 = font.render('CHARACTERS', True, (0, 0, 0))
     title2 = font.render('POWER UPS', True, (0, 0, 0))
-    darken = pygame.transform.scale(pygame.image.load("images/darken.png"), (screen_w, screen_h))
-    shop_title = pygame.transform.scale(pygame.image.load("images/SHOP_title.png"), (685/3.5, 200/3.5))
-    shop_bg = pygame.transform.scale(pygame.image.load("images/shop_bg.png"), (screen_w * 0.8, screen_h * 0.7))
-    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (510/4.5, 155/4.5))
-    buy_button = pygame.transform.scale(pygame.image.load("images/BUY_button.png"), (818/8.7, 300/8.7))
+    darken = pygame.transform.scale(pygame.image.load("images/darken.png").convert_alpha(), (screen_w, screen_h))
+    shop_title = pygame.transform.scale(pygame.image.load("images/SHOP_title.png").convert_alpha(), (685/3.5, 200/3.5))
+    shop_bg = pygame.transform.scale(pygame.image.load("images/shop_bg.png").convert_alpha(), (screen_w * 0.8, screen_h * 0.7))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (510/4.5, 155/4.5))
+    buy_button = pygame.transform.scale(pygame.image.load("images/BUY_button.png").convert_alpha(), (818/8.7, 300/8.7))
 
     # Character images and definitions
-    theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png"), (80, 80))
-    normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png"), (80, 80))
-    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
-    jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png"), (80, 80))
-    normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png"), (80, 80))
-    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/jekyll_definition.png"), (450, 80))
+    theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png").convert_alpha(), (80, 80))
+    normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png").convert_alpha(), (80, 80))
+    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
+    jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png").convert_alpha(), (80, 80))
+    normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png").convert_alpha(), (80, 80))
+    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/jekyll_definition.png").convert_alpha(), (450, 80))
     
     # Power-up images and definitions
-    normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png"), (80, 80))
-    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png"), (80, 80))
-    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
-    normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png"), (80, 80))
-    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png"), (80, 80))
-    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png"), (450, 80))
+    normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png").convert_alpha(), (80, 80))
+    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png").convert_alpha(), (80, 80))
+    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
+    normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png").convert_alpha(), (80, 80))
+    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png").convert_alpha(), (80, 80))
+    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
     
     # Sign
     text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
@@ -520,7 +529,7 @@ def bar(health, orig_health):
 
 # Displays health bar
 def draw_health_bar(health, orig_health):
-    border = pygame.transform.scale(pygame.image.load('images/bar_border.png'), (300, 30))
+    border = pygame.transform.scale(pygame.image.load('images/bar_border.png').convert_alpha(), (300, 30))
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
     text = font.render(str(int(health)), True, (255, 255, 255))
     if health > 70:
@@ -537,10 +546,10 @@ def draw_health_bar(health, orig_health):
 
 # Displays power-ups
 def power_ups():
-    grey_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/grey_med_kit.png"), (50, 50))
-    grey_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/grey_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
-    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_med_kit.png"), (50, 50))
-    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_speed_potion.png"), (56 * (50/35), 35 * (50/35)))
+    grey_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/grey_med_kit.png").convert_alpha(), (50, 50))
+    grey_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/grey_speed_potion.png").convert_alpha(), (56 * (50/35), 35 * (50/35)))
+    med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_med_kit.png").convert_alpha(), (50, 50))
+    speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/coloured_speed_potion.png").convert_alpha(), (56 * (50/35), 35 * (50/35)))
     
     items = font.render('Items', True, (255, 255, 255))
     screen.blit(items, (screen_w - 200 - items.get_width(), 30))
@@ -559,12 +568,53 @@ def power_ups():
 # Default character settings - player, position, speed
 player = John()
 
+extraspeed = 0
+extraspeed_duration = 300
+extraspeed_timer = 0
+diagspeed = 0
+
+def setspeed():
+    global speed, diagspeed, extraspeed
+    if picked_character == "John" or picked_character == "Quinn" or picked_character == "Theresa" or picked_character == "Jekyll":
+        speed = -5
+    if picked_character == "Tony":
+        speed = -4
+    if picked_character == "Swift":
+        speed = -7
+    if extraspeed == 1:
+        speed -= 3
+    
+    diagspeed = -(math.sqrt((speed/2)**2 + (speed/2)**2))
+
 # Detects events during game play state
 def detect_events():
-    global charX, charY, charX_change, charY_change, mouse, game_state, player, speed, shop_display
+    global charX, charY, charX_change, charY_change, mouse, game_state, player, speed, shop_display, shop_items, healthdiff, extraspeed, extraspeed_duration, extraspeed_timer
     
     # Detects key pressed
     pressed = pygame.key.get_pressed()
+
+    if pressed[pygame.K_q]:
+        if shop_items['med_kit'] == True:
+            healthdiff = player.orig_health - player.health
+            if healthdiff >= 25:
+                player.health += 25
+            else:
+                player.health += healthdiff
+            
+        shop_items['med_kit'] = False
+
+    if pressed[pygame.K_e]:
+        if shop_items['speed_potion']:
+            extraspeed = 1
+            extraspeed_timer = extraspeed_duration
+            shop_items['speed_potion'] = False
+
+    # Update extraspeed duration
+    if extraspeed_timer > 0:
+        extraspeed_timer -= 1
+    else:
+        extraspeed = 0
+
     if pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_a] and not pressed[pygame.K_d]:
        charX_change = 0
        charY_change = speed
@@ -644,8 +694,8 @@ def border():
         player.rect.y = screen_h - 60
 
 # Back button images
-back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (130, 40))
-high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png"), (130, 40))
+back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
+high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
 
 charX_change = 0
 charY_change = 0
@@ -700,9 +750,9 @@ def play(shop_display, mouse):
 
 def game_over():
     # Images
-    game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png"), (screen_w, screen_h))
-    try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png"), (325, 50))
-    quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png"), (225, 90))
+    game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png").convert_alpha(), (screen_w, screen_h))
+    try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png").convert_alpha(), (325, 50))
+    quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png").convert_alpha(), (225, 90))
 
     # Display images
     screen.blit(game_over_screen, (0, 0))
@@ -713,14 +763,14 @@ def game_over():
             
 def background_story():
     global picked_character
-    john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    tony = pygame.transform.scale(pygame.image.load("images/back_stories/Tony_backstory.png"), (screen_w, screen_h))
-    swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png"), (screen_w, screen_h))
-    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png"), (screen_w, screen_h))
-    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png"), (screen_w, screen_h))
-    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png"), (screen_w, screen_h))
-    continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png"), (275, 40))
-    high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png"), (275, 40))
+    john = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
+    tony = pygame.transform.scale(pygame.image.load("images/back_stories/Tony_backstory.png").convert_alpha(), (screen_w, screen_h))
+    swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png").convert_alpha(), (screen_w, screen_h))
+    quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png").convert_alpha(), (screen_w, screen_h))
+    theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png").convert_alpha(), (screen_w, screen_h))
+    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
+    continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png").convert_alpha(), (275, 40))
+    high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png").convert_alpha(), (275, 40))
     if picked_character == "John":
         screen.blit(john, (0, 0))
     elif picked_character == "Tony":
@@ -742,9 +792,9 @@ def background_story():
 
 def tutorial(mouse):
     global game_state
-    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png"), (screen_w, screen_h))
-    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png"), (130, 40))
-    high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png"), (130, 40))
+    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png").convert_alpha(), (screen_w, screen_h))
+    back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
+    high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
     screen.blit(tut, (0, 0))
     screen.blit(back_button, (screen_w - 200, screen_h - 100))
     if screen_w - 200 <= mouse[0] <= screen_w - 70 and screen_h - 100 <= mouse[1] <= screen_h - 60:
@@ -757,7 +807,7 @@ def tutorial(mouse):
 
 # Setting the game name and logo
 pygame.display.set_caption("Undead Uprising")
-logo = pygame.image.load('images/test_char.png')
+logo = pygame.image.load('images/test_char.png').convert_alpha()
 pygame.display.set_icon(logo)
 
 # State of game and character choice
@@ -804,6 +854,16 @@ def trailfunction():
         trail.draw(screen)
 
     timetotrail -= 1
+
+def detect_collision(zombies, trails):
+    for zombie in zombies:
+        for trail in trails:
+            if zombie.rect.colliderect(trail.trail.get_rect(center=trail.pos)):
+                zombie.health -= 0.0005
+                if zombie.health <= 1 and not zombie.health <= 0:
+                    zombie.image = zombie.half_health_image
+                elif zombie.health <= 0:
+                    zombie.kill()
 
 # Bullet class
 class Bullet(pygame.sprite.Sprite):
@@ -860,9 +920,6 @@ def special():
             if player.health < 120:
                 player.health += 1
             timetoregen = 180
-    
-    if picked_character == "Jekyll":
-        print("placeholder")
 
 def resetGame():
     global all_sprites, zombies, trails, bullets, player, zombie_generation_rate, acc
@@ -880,7 +937,7 @@ running = True
 shop_display = False
 zombies_allowed = True
 paused = False
-paused_screen = pygame.transform.scale(pygame.image.load("images/paused_screen.png"), (screen_w, screen_h))
+paused_screen = pygame.transform.scale(pygame.image.load("images/paused_screen.png").convert_alpha(), (screen_w, screen_h))
 acc = 0
 
 while running:
@@ -899,6 +956,7 @@ while running:
                 game_state = "game_play"
                 all_sprites.add(player)
         elif game_state == "game_play":
+            setspeed()
             detect_events()
         elif game_state == "game_over":
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -931,6 +989,7 @@ while running:
                     timetoshoot = attackspeed
             timetoshoot -= 1.5
             trailfunction()
+            detect_collision(zombies, trails)
             special()
         
         # Display shop screen
