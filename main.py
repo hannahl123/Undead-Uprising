@@ -54,7 +54,6 @@ hovering_quit_b = False
 extraspeed = 0
 extraspeed_duration = 300
 extraspeed_timer = 0
-# diagspeed = 0
 charX_change = 0
 charY_change = 0
 speed = -5
@@ -64,6 +63,8 @@ diagspeed = -3.5
 last_zombie_time = time.time()
 zombie_generation_rate = 0.25
 player_health_decrease_timer = time.time()
+in_well = -1
+well_death = False
 
 # Back button images
 back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
@@ -451,6 +452,21 @@ def startMenu():
 def detect_start_menu():
     global game_state, player, picked_character, hovering_quit_b, hovering_start_b, hovering_tutorial_b
 
+    if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
+        hovering_tutorial_b = True
+    else:
+        hovering_tutorial_b = False
+    
+    if screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
+        hovering_quit_b = True
+    else:
+        hovering_quit_b = False
+
+    if screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
+        hovering_start_b = True
+    else:
+        hovering_start_b = False
+
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
         # Sets player to character clicked
@@ -522,36 +538,21 @@ def detect_start_menu():
         # Quits the game
         elif screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
             sys.exit()
-    else:
-        if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
-            hovering_tutorial_b = True
-        else:
-            hovering_tutorial_b = False
-        
-        if screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
-            hovering_quit_b = True
-        else:
-            hovering_quit_b = False
-
-        if screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
-            hovering_start_b = True
-        else:
-            hovering_start_b = False
 
 # ----------------------------------- Tutorial -----------------------------------
 
 def tutorial(mouse):
     global game_state
-    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial.png").convert_alpha(), (screen_w, screen_h))
+    tut = pygame.transform.scale(pygame.image.load("images/backgrounds/Tutorial Screen.png").convert_alpha(), (screen_w, screen_h))
     back_button = pygame.transform.scale(pygame.image.load("images/BACK_button.png").convert_alpha(), (130, 40))
     high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_BACK_button.png").convert_alpha(), (130, 40))
     screen.blit(tut, (0, 0))
-    screen.blit(back_button, (screen_w - 200, screen_h - 100))
-    if screen_w - 200 <= mouse[0] <= screen_w - 70 and screen_h - 100 <= mouse[1] <= screen_h - 60:
+    screen.blit(back_button, (screen_w - 250, screen_h - 100))
+    if screen_w - 250 <= mouse[0] <= screen_w - 120 and screen_h - 100 <= mouse[1] <= screen_h - 60:
         if event.type == pygame.MOUSEBUTTONDOWN:
             game_state = "start_menu"
         else:
-            screen.blit(high_back_button, (screen_w - 200, screen_h - 100))
+            screen.blit(high_back_button, (screen_w - 250, screen_h - 100))
 
 # ----------------------------------- Shop -----------------------------------
 
@@ -617,11 +618,11 @@ def shop(mouse):
     screen.blit(normal_speed_potion, (screen_w / 2 + 50, 350))
 
     if event.type == pygame.MOUSEBUTTONDOWN:
-        if shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
-            screen.blit(theresa, (175, 350))
+        if shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
+            screen.blit(theresa, (175, 250))
             selected = "theresa"
-        elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
-            screen.blit(jekyll, (175, 450))
+        elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
+            screen.blit(jekyll, (175, 350))
             selected = "jekyll"
         elif shop_items["med_kit"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 250 <= mouse[1] <= 300:
             screen.blit(med_kit, (screen_w / 2 + 50, 250))
@@ -643,9 +644,9 @@ def shop(mouse):
             zombies_allowed = not zombies_allowed
 
     if selected == "theresa":
-        screen.blit(theresa, (175, 350))
+        screen.blit(theresa, (175, 250))
     elif selected == "jekyll":
-        screen.blit(jekyll, (175, 450))
+        screen.blit(jekyll, (175, 350))
     elif selected == "med_kit":
         screen.blit(med_kit, (screen_w / 2 + 50, 250))
     elif selected == "speed_potion":
@@ -830,9 +831,21 @@ def border():
         player.rect.y = screen_h - 60
 
 # Game Play Function
-def play(shop_display, mouse):
-    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc
+def play():
+    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc, in_well, well_death
     border()
+
+    if picked_character == "John" or picked_character == "Tony":
+        if 0.8 * screen_w <= player.rect.x <= 0.9 * screen_w and 0.1 * screen_h + 83 <= player.rect.y <= 0.16 * screen_h + 83:
+            if in_well < 0:
+                in_well = time.time()
+            if time.time() - in_well >= 1:
+                well_death = True
+                player.health = 0
+                in_well = -1
+        else:
+            in_well = -1
+                
 
     # Character movement changes
     player.rect.x += charX_change
@@ -856,7 +869,7 @@ def play(shop_display, mouse):
         hits = pygame.sprite.spritecollide(player, zombies, False)
         for zombie in hits:
             current_time = time.time()
-            if current_time - player_health_decrease_timer >= 0.5:
+            if current_time - player_health_decrease_timer >= 0.33333333:
                 player.health -= 1
                 player_health_decrease_timer = current_time
 
@@ -871,13 +884,20 @@ def play(shop_display, mouse):
         game_state = 'game_over'
 
 def game_over():
+    global well_death
+
     # Images
     game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png").convert_alpha(), (screen_w, screen_h))
+    well_game_over_screen = pygame.transform.scale(pygame.image.load("images/well_game_over_screen.png").convert_alpha(), (screen_w, screen_h))    
     try_again = pygame.transform.scale(pygame.image.load("images/TRY_AGAIN_button.png").convert_alpha(), (325, 50))
     quit = pygame.transform.scale(pygame.image.load("images/QUIT_button.png").convert_alpha(), (225, 90))
 
     # Display images
-    screen.blit(game_over_screen, (0, 0))
+    if well_death:
+        screen.blit(well_game_over_screen, (0, 0))
+    else:
+        screen.blit(game_over_screen, (0, 0))
+    
     screen.blit(try_again, (200, screen_h - 150))
     screen.blit(quit, (screen_w - 500, screen_h - 175))
 
@@ -975,7 +995,7 @@ while running:
         bar(player.health, player.orig_health)
         
         if zombies_allowed:
-            play(shop_display, mouse)
+            play()
 
             # Bullet Detection
             pressed = pygame.key.get_pressed()
