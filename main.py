@@ -12,7 +12,7 @@
 # Lines 661 - 883 Game Play Functions (top menu bar, movement, reset character stats, game over, etc.)
 # Lines 884 - 922 Bullet Shooting
 # LInes 923 - 933 Reset Game After Round
-# Lines 934 - 1008 Main Loop of Game
+# Lines 934 - ### Main Loop of Game
 
 # ----------------------------------- Imports and Initialization -----------------------------------
 
@@ -29,7 +29,7 @@ mixer.init()
 
 # Setting size of screen to full screen
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
-screen_w, screen_h = true_res[0], true_res[1]
+screen_w, screen_h = 1280, 720
 screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
 
 # Setting the game name and logo
@@ -116,11 +116,11 @@ class Tony(pygame.sprite.Sprite):
     h_tony = pygame.image.load('images/characters/h_tony.png').convert_alpha()
     char_img = pygame.image.load('images/characters/tony.png').convert_alpha()
     clicked = False
-    orig_health = 100
+    orig_health = 200
 
     def __init__(self):
         super().__init__()
-        self.health = 100
+        self.health = 200
         self.image = pygame.image.load('images/characters/player_tony.png').convert_alpha()
         self.rect = self.image.get_rect(center=(screen_w // 2, screen_h // 2))
 
@@ -141,11 +141,11 @@ class Swift(pygame.sprite.Sprite):
     h_swift = pygame.image.load('images/characters/h_swift.png').convert_alpha()
     char_img = pygame.image.load('images/characters/swift.png').convert_alpha()
     clicked = False
-    orig_health = 75
+    orig_health = 50
 
     def __init__(self):
         super().__init__()
-        self.health = 75
+        self.health = 50
         self.image = pygame.image.load('images/characters/player_swift.png').convert_alpha()
         self.rect = self.image.get_rect(center=(screen_w // 2, screen_h // 2))
 
@@ -165,21 +165,24 @@ class Quinn(pygame.sprite.Sprite):
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png').convert_alpha(), (screen_w, screen_h))
     h_quinn = pygame.image.load('images/characters/h_quinn.png').convert_alpha()
     char_img = pygame.image.load('images/characters/quinn.png').convert_alpha()
+    grey_quinn = pygame.image.load('images/characters/grey_quinn.png')
     clicked = False
-    orig_health = 120
+    orig_health = 135
 
     def __init__(self):
         super().__init__()
-        self.health = 120
+        self.health = 135
         self.image = pygame.image.load('images/characters/player_quinn.png').convert_alpha()
         self.rect = self.image.get_rect(center=(screen_w//2, screen_h//2))
 
     def show():
-        if Quinn.clicked:
+        if Quinn.clicked and shop_items["quinn"] == True:
             screen.blit(Quinn.h_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
             Quinn.music()
         else:
             screen.blit(Quinn.char_img, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
+        if shop_items["quinn"] == False:
+            screen.blit(Quinn.grey_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
 
     def music():
         mixer.music.load('background_music/magma.mp3')
@@ -229,11 +232,11 @@ class Jekyll(pygame.sprite.Sprite):
     h_jekyll = pygame.image.load('images/characters/h_jekyll.png').convert_alpha()
     grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png').convert_alpha()
     clicked = False
-    orig_health = 120
+    orig_health = 100
 
     def __init__(self):
         super().__init__()
-        self.health = 120
+        self.health = 100
         self.image = pygame.image.load('images/characters/player_jekyll.png').convert_alpha()
         self.rect = self.image.get_rect(center=(screen_w//2, screen_h//2))
 
@@ -497,7 +500,7 @@ def detect_start_menu():
             else:
                 John.clicked, Tony.clicked, Swift.clicked, Quinn.clicked, Theresa.clicked, Jekyll.clicked = False, False, True, False, False, False
             print('Swift is picked')
-        elif screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
+        elif shop_items["quinn"] == True and screen_w * (0.28 + 3 * 0.077) <= mouse[0] <= screen_w * (0.28 + 3 * 0.077) + 50 and screen_h / 2 + 20 <= mouse[1] <= screen_h / 2 + 80:
             all_sprites.remove(player)
             player = Quinn()
             picked_character = "Quinn"
@@ -559,26 +562,28 @@ def tutorial(mouse):
 points = 16000
 
 shop_items = {
+    "quinn" : False,
     "theresa" : False, 
     "jekyll" : False,
     "med_kit" : False,
-    "speed_potion" : False,
+    "speed_potion" : False
 }
 
 costs = {
+    "quinn" : 1000, 
     "theresa" : 1000,
     "jekyll" : 1000,
-    "med_kit" : 100,
-    "speed_potion" : 100,
+    "med_kit" : 200,
+    "speed_potion" : 200
 }
 
 selected = ""
 
 def shop(mouse):
-    global selected, shop_display, points, zombies_allowed
+    global selected, shop_display, points, zombies_allowed, font
 
     # Images, text, etc.
-    font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
+    text_font = pygame.font.SysFont('courier new', 15) # sets the font family and font size
     title1 = font.render('CHARACTERS', True, (0, 0, 0))
     title2 = font.render('POWER UPS', True, (0, 0, 0))
     darken = pygame.transform.scale(pygame.image.load("images/darken.png").convert_alpha(), (screen_w, screen_h))
@@ -588,13 +593,22 @@ def shop(mouse):
     buy_button = pygame.transform.scale(pygame.image.load("images/BUY_button.png").convert_alpha(), (818/8.7, 300/8.7))
 
     # Character images and definitions
+    quinn = pygame.transform.scale(pygame.image.load("images/characters/circle_quinn.png"), (80, 80))
+    normal_quinn = pygame.transform.scale(pygame.image.load("images/characters/normal_quinn.png"), (80, 80))
+    quinn_title = text_font.render("QUINN", True, (0, 0, 0))
+    quinn_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
+    quinn_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
     theresa = pygame.transform.scale(pygame.image.load("images/characters/circle_theresa.png").convert_alpha(), (80, 80))
     normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png").convert_alpha(), (80, 80))
-    theresa_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
+    theresa_title = text_font.render("THERESA", True, (0, 0, 0))
+    theresa_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
+    theresa_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
     jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png").convert_alpha(), (80, 80))
     normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png").convert_alpha(), (80, 80))
-    jekyll_def = pygame.transform.scale(pygame.image.load("images/characters/jekyll_definition.png").convert_alpha(), (450, 80))
-    
+    jekyll_title = text_font.render("QUINN", True, (0, 0, 0))
+    jekyll_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
+    jekyll_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
+
     # Power-up images and definitions
     normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png").convert_alpha(), (80, 80))
     med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png").convert_alpha(), (80, 80))
@@ -612,17 +626,21 @@ def shop(mouse):
     screen.blit(shop_bg, (screen_w * 0.1, 150))
     screen.blit(title1, (300, 185))
     screen.blit(title2, (800, 185))
-    screen.blit(normal_theresa, (175, 250))
-    screen.blit(normal_jekyll, (175, 350))
+    screen.blit(normal_quinn, (175, 250))
+    screen.blit(normal_theresa, (175, 350))
+    screen.blit(normal_jekyll, (175, 450))
     screen.blit(normal_med_kit, (screen_w / 2 + 50, 250))
     screen.blit(normal_speed_potion, (screen_w / 2 + 50, 350))
 
     if event.type == pygame.MOUSEBUTTONDOWN:
-        if shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
-            screen.blit(theresa, (175, 250))
+        if shop_items["quinn"] == False and 175 <= mouse[0] <= 250 and 250 <= mouse[1] <= 325:
+            screen.blit(quinn, (175, 250))
+            selected = "quinn"
+        if shop_items["theresa"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
+            screen.blit(theresa, (175, 350))
             selected = "theresa"
-        elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 350 <= mouse[1] <= 425:
-            screen.blit(jekyll, (175, 350))
+        elif shop_items["jekyll"] == False and 175 <= mouse[0] <= 250 and 450 <= mouse[1] <= 525:
+            screen.blit(jekyll, (175, 450))
             selected = "jekyll"
         elif shop_items["med_kit"] == False and screen_w / 2 + 50 <= mouse[0] <= screen_w / 2 + 100 and 250 <= mouse[1] <= 300:
             screen.blit(med_kit, (screen_w / 2 + 50, 250))
@@ -643,17 +661,27 @@ def shop(mouse):
             shop_display = not shop_display
             zombies_allowed = not zombies_allowed
 
-    if selected == "theresa":
-        screen.blit(theresa, (175, 250))
+    if selected == "quinn":
+        screen.blit(quinn, (175, 250))
+    elif selected == "theresa":
+        screen.blit(theresa, (175, 350))
     elif selected == "jekyll":
-        screen.blit(jekyll, (175, 350))
+        screen.blit(jekyll, (175, 450))
     elif selected == "med_kit":
         screen.blit(med_kit, (screen_w / 2 + 50, 250))
     elif selected == "speed_potion":
         screen.blit(speed_potion, (screen_w / 2 + 50, 350))
 
-    screen.blit(theresa_def, (275, 255))
-    screen.blit(jekyll_def, (275, 355))
+    screen.blit(quinn_title, (275, 265))
+    screen.blit(quinn_cost, (275, 285))
+    screen.blit(quinn_feature, (275, 305))
+    screen.blit(theresa_title, (275, 365))
+    screen.blit(theresa_cost, (275, 385))
+    screen.blit(theresa_feature, (275, 405))
+    screen.blit(jekyll_title, (275, 465))
+    screen.blit(jekyll_cost, (275, 485))
+    screen.blit(jekyll_feature, (275, 505))
+
     screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
     screen.blit(speed_potion_def, (screen_w / 2 + 150, 355))
     screen.blit(buy_button, (500, screen_h - 150))
@@ -845,7 +873,6 @@ def play():
                 in_well = -1
         else:
             in_well = -1
-                
 
     # Character movement changes
     player.rect.x += charX_change
@@ -943,13 +970,14 @@ class Bullet(pygame.sprite.Sprite):
 # ----------------------------------- Reset Game After Round -----------------------------------
 
 def resetGame():
-    global all_sprites, zombies, trails, bullets, player, zombie_generation_rate, acc
+    global all_sprites, zombies, trails, bullets, player, zombie_generation_rate, acc, points
     player.__init__()
     all_sprites = pygame.sprite.Group()
     zombies = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
     zombie_generation_rate = 0.25
     acc = 0
+    points = 0
 
 # ----------------------------------- Main Loop of Game -----------------------------------
 
