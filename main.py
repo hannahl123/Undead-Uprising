@@ -72,7 +72,7 @@ high_back_button = pygame.transform.scale(pygame.image.load("images/highlighted_
 
 # Bullet variables
 timetoshoot = 0
-attackspeed = 20
+attackspeed = 50
 
 # Jekyll's trail variables
 trails = []
@@ -132,7 +132,7 @@ class Tony(pygame.sprite.Sprite):
             screen.blit(Tony.char_img, (screen_w * (0.28 + 0.077), screen_h / 2 + 20))
     
     def music():
-        mixer.music.load('background_music/earth.mp3')
+        mixer.music.load('background_music/tony.mp3')
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
@@ -185,7 +185,7 @@ class Quinn(pygame.sprite.Sprite):
             screen.blit(Quinn.grey_quinn, (screen_w * (0.28 + 3 * 0.077), screen_h / 2 + 20))
 
     def music():
-        mixer.music.load('background_music/magma.mp3')
+        mixer.music.load('background_music/quinn.mp3')
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
@@ -227,7 +227,7 @@ class Theresa(pygame.sprite.Sprite):
             Theresa.timetoregen = 180
 
 class Jekyll(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_snow_ice.png').convert_alpha(), (screen_w, screen_h))
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_lab.png').convert_alpha(), (screen_w, screen_h))
     char_img = pygame.image.load('images/characters/jekyll.png').convert_alpha()
     h_jekyll = pygame.image.load('images/characters/h_jekyll.png').convert_alpha()
     grey_jekyll = pygame.image.load('images/characters/grey_jekyll.png').convert_alpha()
@@ -305,16 +305,18 @@ def detect_collision(zombies, trails):
 # ----------------------------------- Zombie Classes and Auto-generation -----------------------------------
 
 class shieldZombie(pygame.sprite.Sprite):
+    identity = "shield"
 
     def __init__(self, target):
         super().__init__()
         self.health = 3
         self.full_health_image = pygame.image.load("images/zombies/shield_zombie_full_health.png").convert_alpha()
-        self.half_health_image = pygame.image.load("images/zombies/shield_zombie_half_health.png").convert_alpha()
+        self.two_health_image = pygame.image.load("images/zombies/shield_zombie_two_health.png").convert_alpha()
+        self.one_health_image = pygame.image.load("images/zombies/shield_zombie_one_health.png").convert_alpha()
         self.image = self.full_health_image
         self.rect = self.image.get_rect()
         self.target = target
-        self.speed = random.uniform(2, 4) # # Random speed between 1 and 3
+        self.speed = random.uniform(2, 4) # Random speed between 1 and 3
     
     def update(self):
         # Calculate direction towards the player
@@ -328,6 +330,7 @@ class shieldZombie(pygame.sprite.Sprite):
             self.rect.y += (dy / distance) * self.speed
 
 class Zombie(pygame.sprite.Sprite):
+    identity = "normal"
 
     def __init__(self, target):
         super().__init__()
@@ -351,22 +354,34 @@ class Zombie(pygame.sprite.Sprite):
             self.rect.y += (dy / distance) * self.speed
 
 # Generates zombie randomly around the border of the screen
-def generate_zombie():
+def generate_zombie(type):
     side = random.choice(["top", "bottom", "left", "right"])
     if side == "top":
-        zombie = Zombie(player)
+        if type == "shield":
+            zombie = shieldZombie(player)
+        else:
+            zombie = Zombie(player)
         zombie.rect.x = random.randrange(screen_w - zombie.rect.width)
         zombie.rect.y = 85
     elif side == "bottom":
-        zombie = Zombie(player)
+        if type == "shield":
+            zombie = shieldZombie(player)
+        else:
+            zombie = Zombie(player)
         zombie.rect.x = random.randrange(screen_w - zombie.rect.width)
         zombie.rect.y = screen_h - zombie.rect.height
     elif side == "left":
-        zombie = Zombie(player)
+        if type == "shield":
+            zombie = shieldZombie(player)
+        else:
+            zombie = Zombie(player)
         zombie.rect.x = 0
         zombie.rect.y = random.randint(85, screen_h - zombie.rect.height)
     elif side == "right":
-        zombie = Zombie(player)
+        if type == "shield":
+            zombie = shieldZombie(player)
+        else:
+            zombie = Zombie(player)
         zombie.rect.x = screen_w - zombie.rect.width
         zombie.rect.y = random.randint(85, screen_h - zombie.rect.height)
 
@@ -614,12 +629,13 @@ def shop(mouse):
     med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png").convert_alpha(), (80, 80))
     med_kit_title = text_font.render("MEDICINE KIT", True, (0, 0, 0))
     med_kit_cost = text_font.render("Cost: 200 points", True, (0, 0, 0))
-    med_kit_feature = text_font.render("Cost: 1000 points", True, (0, 0, 0))
-    med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
+    med_kit_feature = text_font.render("Restores 25HP instantly when activated", True, (0, 0, 0))
     normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png").convert_alpha(), (80, 80))
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png").convert_alpha(), (80, 80))
-    speed_potion_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
-    
+    speed_potion_title = text_font.render("SPEED POTION", True, (0, 0, 0))
+    speed_potion_cost = text_font.render("Cost: 200 points", True, (0, 0, 0))
+    speed_potion_feature = text_font.render("Boosts speed for 10 seconds when activated", True, (0, 0, 0))
+
     # Sign
     text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
 
@@ -685,8 +701,15 @@ def shop(mouse):
     screen.blit(jekyll_cost, (275, 485))
     screen.blit(jekyll_feature, (275, 505))
 
-    screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
-    screen.blit(speed_potion_def, (screen_w / 2 + 150, 355))
+    screen.blit(med_kit_title, (screen_w / 2 + 150, 265))
+    screen.blit(med_kit_cost, (screen_w / 2 + 150, 285))
+    screen.blit(med_kit_feature, (screen_w / 2 + 150, 305))
+
+    # screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
+
+    screen.blit(speed_potion_title, (screen_w / 2 + 150, 365))
+    screen.blit(speed_potion_cost, (screen_w / 2 + 150, 385))
+    screen.blit(speed_potion_feature, (screen_w / 2 + 150, 405))
     screen.blit(buy_button, (500, screen_h - 150))
     screen.blit(back_button, (screen_w - 600, screen_h - 150))
 
@@ -861,9 +884,11 @@ def border():
     if player.rect.y >= screen_h - 60:
         player.rect.y = screen_h - 60
 
+normalCount = 0
+
 # Game Play Function
 def play():
-    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc, in_well, well_death
+    global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc, in_well, well_death, normalCount
     border()
 
     if picked_character == "John" or picked_character == "Tony":
@@ -887,14 +912,24 @@ def play():
         time_elapsed = current_time - last_zombie_time
         if time_elapsed >= 1 / zombie_generation_rate:
             # Generate a zombie
-            generate_zombie()
+            if normalCount == 8:
+                generate_zombie("shield")
+                normalCount = 0
+            else:
+                generate_zombie("normal")
+            normalCount += 1
 
             # Update last zombie generation time
             last_zombie_time = current_time
 
             # Increase zombie generation rate over time
-            zombie_generation_rate += 0.005
-            acc += 0.0005
+            if zombie_generation_rate < 0.5:
+                zombie_generation_rate += 0.05
+            elif zombie_generation_rate < 1:
+                zombie_generation_rate += 0.03
+            else:
+                zombie_generation_rate += 0.015
+            acc += 0.0001
 
         hits = pygame.sprite.spritecollide(player, zombies, False)
         for zombie in hits:
@@ -942,7 +977,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=start_pos)
         self.start_pos = start_pos
         self.target_pos = target_pos
-        self.speed = 12
+        self.speed = 10
     
     def update(self):
         global points
@@ -959,11 +994,20 @@ class Bullet(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide(self, zombies, False)
             for zombie in hits:
                 zombie.health -= 1
-                if zombie.health == 1:
-                    zombie.image = zombie.half_health_image
-                elif zombie.health <= 0:
-                    zombie.kill()
-                    points += random.randint(5, 10)
+                if zombie.identity == "normal":
+                    if zombie.health == 1:
+                        zombie.image = zombie.half_health_image
+                    elif zombie.health <= 0:
+                        zombie.kill()
+                        points += random.randint(5, 8)
+                else:
+                    if zombie.health == 2 and not zombie.health <= 1:
+                        zombie.image = zombie.two_health_image
+                    elif zombie.health <= 1 and not zombie.health <= 0:
+                        zombies.image = zombie.one_health_image
+                    elif zombie.health <= 0:
+                        zombie.kill()
+                        points += random.randint(9, 12)
                 self.kill()
 
             # Check if the bullet is outside the screen boundaries
@@ -978,7 +1022,7 @@ def resetGame():
     all_sprites = pygame.sprite.Group()
     zombies = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
-    zombie_generation_rate = 0.25
+    zombie_generation_rate = 0.45
     acc = 0
     points = 0
 
@@ -1031,7 +1075,7 @@ while running:
             # Bullet Detection
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_SPACE]:
-                if timetoshoot <= abs(1 - acc):
+                if timetoshoot <= abs(2.5 - acc):
                     start_pos = player.rect.center
                     target_pos = pygame.mouse.get_pos()
                     bullet = Bullet(start_pos, target_pos)
