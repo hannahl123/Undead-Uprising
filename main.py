@@ -305,9 +305,9 @@ def detect_collision(zombies, trails):
                 else:
                     if zombie.health <= 2 and not zombie.health <= 1:
                         zombie.image = zombie.two_health_image
-                    if zombie.health <= 1 and not zombie.health <= 0:
+                    elif zombie.health <= 1 and not zombie.health <= 0:
                         zombie.image = zombie.one_health_image
-                    if zombie.health <= 0:
+                    elif zombie.health <= 0:
                         zombie.kill()
 
 # ----------------------------------- Zombie Classes and Auto-generation -----------------------------------
