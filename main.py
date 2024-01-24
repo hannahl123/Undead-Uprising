@@ -305,16 +305,10 @@ def detect_collision(zombies, trails):
                 else:
                     if zombie.health <= 2 and not zombie.health <= 1:
                         zombie.image = zombie.two_health_image
-                    elif zombie.health <= 1 and not zombie.health <= 0:
-                        zombies.image = zombie.one_health_image
-                    elif zombie.health <= 0:
+                    if zombie.health <= 1 and not zombie.health <= 0:
+                        zombie.image = zombie.one_health_image
+                    if zombie.health <= 0:
                         zombie.kill()
-
-                """
-                if zombie.health <= 1 and not zombie.health <= 0:
-                    zombie.image = zombie.half_health_image
-                elif zombie.health <= 0:
-                    zombie.kill()"""
 
 # ----------------------------------- Zombie Classes and Auto-generation -----------------------------------
 
@@ -927,7 +921,7 @@ def play():
         time_elapsed = current_time - last_zombie_time
         if time_elapsed >= 1 / zombie_generation_rate:
             # Generate a zombie
-            if normalCount == 8:
+            if normalCount == 1:
                 generate_zombie("shield")
                 normalCount = 0
             else:
@@ -941,9 +935,9 @@ def play():
             if zombie_generation_rate < 0.5:
                 zombie_generation_rate += 0.05
             elif zombie_generation_rate < 1:
-                zombie_generation_rate += 0.03
+                zombie_generation_rate += 0.02
             else:
-                zombie_generation_rate += 0.015
+                zombie_generation_rate += 0.01
             acc += 0.0001
 
         hits = pygame.sprite.spritecollide(player, zombies, False)
@@ -1019,10 +1013,10 @@ class Bullet(pygame.sprite.Sprite):
                         zombie.kill()
                         points += random.randint(5, 8)
                 else:
-                    if zombie.health == 2 and not zombie.health <= 1:
+                    if 1 < zombie.health <= 2:
                         zombie.image = zombie.two_health_image
-                    elif zombie.health <= 1 and not zombie.health <= 0:
-                        zombies.image = zombie.one_health_image
+                    elif 0 < zombie.health <= 1:
+                        zombie.image = zombie.one_health_image
                     elif zombie.health <= 0:
                         zombie.kill()
                         points += random.randint(9, 12)
