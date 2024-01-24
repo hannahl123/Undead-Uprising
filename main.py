@@ -112,7 +112,7 @@ class John(pygame.sprite.Sprite):
         mixer.music.play(-1)
 
 class Tony(pygame.sprite.Sprite):
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_snow_ice.png').convert_alpha(), (screen_w, screen_h))
     h_tony = pygame.image.load('images/characters/h_tony.png').convert_alpha()
     char_img = pygame.image.load('images/characters/tony.png').convert_alpha()
     clicked = False
@@ -159,7 +159,7 @@ class Swift(pygame.sprite.Sprite):
     def music():
         mixer.music.load('background_music/rainbow.mp3')
         mixer.music.play(-1)
-        mixer.music.set_volume(0.5)
+        mixer.music.set_volume(1.5)
 
 class Quinn(pygame.sprite.Sprite):
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png').convert_alpha(), (screen_w, screen_h))
@@ -250,7 +250,7 @@ class Jekyll(pygame.sprite.Sprite):
             screen.blit(Jekyll.grey_jekyll, (screen_w * (0.28 + 5 * 0.077), screen_h / 2 + 20))
 
     def music():
-        mixer.music.load('background_music/snow.mp3')
+        mixer.music.load('background_music/jekyll.mp3')
         mixer.music.play(-1)
         mixer.music.set_volume(0.5)
 
@@ -728,11 +728,11 @@ def draw_health_bar(health, orig_health):
     border = pygame.transform.scale(pygame.image.load('images/bar_border.png').convert_alpha(), (300, 30))
     font = pygame.font.SysFont('consolas', 30) # sets the font family and font size
     text = font.render(str(int(health)), True, (255, 255, 255))
-    if health > 70:
+    if health > 0.7 * player.orig_health:
         color = (0, 255, 0)
-    elif health > 50:
+    elif health > 0.5 * player.orig_health:
         color = (173, 255, 47)
-    elif health > 20:
+    elif health > 0.2 * player.orig_health:
         color = (255, 150, 50)
     else:
         color = (255, 0, 0)
@@ -973,7 +973,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, start_pos, target_pos):
         super().__init__()
         self.image = pygame.Surface((7, 7))
-        self.image.fill((255, 255, 255))
+        self.image.fill((255, 231, 105))
         self.rect = self.image.get_rect(center=start_pos)
         self.start_pos = start_pos
         self.target_pos = target_pos
@@ -1066,9 +1066,12 @@ while running:
         background_story()
     elif game_state == "game_play":
         # Basic screen set-up
-        screen.blit(player.bg, (0, 80))
+        if picked_character == "Jekyll":
+            screen.blit(player.bg, (0, 0))
+        else:
+            screen.blit(player.bg, (0, 40))
         bar(player.health, player.orig_health)
-        
+
         if zombies_allowed:
             play()
 
