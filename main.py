@@ -411,7 +411,7 @@ def background_story():
     swift = pygame.transform.scale(pygame.image.load("images/back_stories/Swift_backstory.png").convert_alpha(), (screen_w, screen_h))
     quinn = pygame.transform.scale(pygame.image.load("images/back_stories/Quinn_backstory.png").convert_alpha(), (screen_w, screen_h))
     theresa = pygame.transform.scale(pygame.image.load("images/back_stories/Theresa_backstory.png").convert_alpha(), (screen_w, screen_h))
-    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/John_backstory.png").convert_alpha(), (screen_w, screen_h))
+    jekyll = pygame.transform.scale(pygame.image.load("images/back_stories/Jekyll_backstory.png").convert_alpha(), (screen_w, screen_h))
     continue_button = pygame.transform.scale(pygame.image.load("images/CONTINUE_button.png").convert_alpha(), (275, 40))
     high_continue_button = pygame.transform.scale(pygame.image.load("images/highlighted_buttons/highlighted_CONTINUE_button.png").convert_alpha(), (275, 40))
     if picked_character == "John":
@@ -588,7 +588,7 @@ def tutorial(mouse):
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 16000
+points = 0
 
 shop_items = {
     "quinn" : False,
