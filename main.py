@@ -583,7 +583,7 @@ def shop(mouse):
     global selected, shop_display, points, zombies_allowed, font
 
     # Images, text, etc.
-    text_font = pygame.font.SysFont('courier new', 15) # sets the font family and font size
+    text_font = pygame.font.SysFont('comic sans', 15, bold=True) # sets the font family and font size
     title1 = font.render('CHARACTERS', True, (0, 0, 0))
     title2 = font.render('POWER UPS', True, (0, 0, 0))
     darken = pygame.transform.scale(pygame.image.load("images/darken.png").convert_alpha(), (screen_w, screen_h))
@@ -605,13 +605,16 @@ def shop(mouse):
     theresa_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
     jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png").convert_alpha(), (80, 80))
     normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png").convert_alpha(), (80, 80))
-    jekyll_title = text_font.render("QUINN", True, (0, 0, 0))
+    jekyll_title = text_font.render("JEKYLL", True, (0, 0, 0))
     jekyll_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
     jekyll_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
 
     # Power-up images and definitions
     normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png").convert_alpha(), (80, 80))
     med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/circled_med_kit.png").convert_alpha(), (80, 80))
+    med_kit_title = text_font.render("MEDICINE KIT", True, (0, 0, 0))
+    med_kit_cost = text_font.render("Cost: 200 points", True, (0, 0, 0))
+    med_kit_feature = text_font.render("Cost: 1000 points", True, (0, 0, 0))
     med_kit_def = pygame.transform.scale(pygame.image.load("images/characters/theresa_definition.png").convert_alpha(), (450, 80))
     normal_speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/normal_speed_potion.png").convert_alpha(), (80, 80))
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png").convert_alpha(), (80, 80))
