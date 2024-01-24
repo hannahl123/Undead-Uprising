@@ -921,7 +921,7 @@ def play():
         time_elapsed = current_time - last_zombie_time
         if time_elapsed >= 1 / zombie_generation_rate:
             # Generate a zombie
-            if normalCount == 1:
+            if normalCount == 8:
                 generate_zombie("shield")
                 normalCount = 0
             else:
