@@ -30,7 +30,7 @@ mixer.init()
 # Setting size of screen to full screen
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 screen_w, screen_h = 1280, 720
-screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((screen_w, screen_h))
 
 # Setting the game name and logo
 pygame.display.set_caption("Undead Uprising")
@@ -297,10 +297,24 @@ def detect_collision(zombies, trails):
         for trail in trails:
             if zombie.rect.colliderect(trail.trail.get_rect(center=trail.pos)):
                 zombie.health -= 0.0005
+                if zombie.identity == "normal":
+                    if zombie.health <= 1 and not zombie.health <= 0:
+                        zombie.image = zombie.half_health_image
+                    elif zombie.health <= 0:
+                        zombie.kill()
+                else:
+                    if zombie.health <= 2 and not zombie.health <= 1:
+                        zombie.image = zombie.two_health_image
+                    elif zombie.health <= 1 and not zombie.health <= 0:
+                        zombies.image = zombie.one_health_image
+                    elif zombie.health <= 0:
+                        zombie.kill()
+
+                """
                 if zombie.health <= 1 and not zombie.health <= 0:
                     zombie.image = zombie.half_health_image
                 elif zombie.health <= 0:
-                    zombie.kill()
+                    zombie.kill()"""
 
 # ----------------------------------- Zombie Classes and Auto-generation -----------------------------------
 
@@ -872,6 +886,7 @@ def detect_events():
             charX_change = 0
             charY_change = 0
             game_state = 'start_menu'
+            resetGame()
 
 # Creates a border around the screen that stops the character from moving out of screen
 def border():
@@ -949,7 +964,10 @@ def play():
         game_state = 'game_over'
 
 def game_over():
-    global well_death
+    global well_death, all_sprites, player
+    all_sprites.empty()
+    zombies.empty()
+    bullets.empty()
 
     # Images
     game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png").convert_alpha(), (screen_w, screen_h))
