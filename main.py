@@ -348,7 +348,7 @@ class Zombie(pygame.sprite.Sprite):
         self.image = self.full_health_image
         self.rect = self.image.get_rect()
         self.target = target
-        self.speed = random.uniform(1, 3) # # Random speed between 1 and 3
+        self.speed = random.uniform(1, 2) # Random speed between 1 and 2
     
     def update(self):
         # Calculate direction towards the player
@@ -582,7 +582,7 @@ def tutorial(mouse):
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 0
+points = 100000
 
 shop_items = {
     "quinn" : False,
@@ -1011,7 +1011,7 @@ class Bullet(pygame.sprite.Sprite):
                         zombie.image = zombie.half_health_image
                     elif zombie.health <= 0:
                         zombie.kill()
-                        points += random.randint(5, 8)
+                        points += 10
                 else:
                     if 1 < zombie.health <= 2:
                         zombie.image = zombie.two_health_image
@@ -1019,7 +1019,7 @@ class Bullet(pygame.sprite.Sprite):
                         zombie.image = zombie.one_health_image
                     elif zombie.health <= 0:
                         zombie.kill()
-                        points += random.randint(9, 12)
+                        points += 15
                 self.kill()
 
             # Check if the bullet is outside the screen boundaries
