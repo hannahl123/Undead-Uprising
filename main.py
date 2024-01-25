@@ -1,18 +1,18 @@
 # Undead Uprising
 # Updated as of January 22, 2024
-# Lines 15 - 27 Imports and Initialization
+# Lines 17 - 27 Imports and Initialization
 # Lines 28 - 80 Game Settings and Details
 # Lines 81 - 86 Sprite Groups
-# Lines 87 - 300 Character Classes
-# Lines 301 - 371 Zombie Classes and Auto-generation
-# Lines 372 - 400 Background Stories
-# Lines 401 - 540 Start Menu
-# Line 541 - 555 Tutorial
-# Lines 556 - 660 Shop
-# Lines 661 - 883 Game Play Functions (top menu bar, movement, reset character stats, game over, etc.)
-# Lines 884 - 922 Bullet Shooting
-# Lines 923 - 933 Reset Game After Round
-# Lines 934 - ### Main Loop of Game
+# Lines 87 - 311 Character Classes
+# Lines 312 - 397 Zombie Classes and Auto-generation
+# Lines 398 - 426 Background Stories
+# Lines 427 - 566 Start Menu
+# Line 567 - 581 Tutorial
+# Lines 582 - 722 Shop
+# Lines 723 - 979 Game Play Functions (top menu bar, movement, reset character stats, game over, etc.)
+# Lines 980 - 1027 Bullet Shooting
+# Lines 1028 - 1039 Reset Game After Round
+# Lines 1040 - 1118 Main Loop of Game
 
 # ----------------------------------- Imports and Initialization -----------------------------------
 
