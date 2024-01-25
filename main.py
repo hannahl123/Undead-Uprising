@@ -28,7 +28,6 @@ mixer.init()
 # ----------------------------------- Game Settings and Global Variables -----------------------------------
 
 # Setting size of screen to full screen
-true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 screen_w, screen_h = 1280, 720
 screen = pygame.display.set_mode((screen_w, screen_h))
 
