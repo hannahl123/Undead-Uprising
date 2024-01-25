@@ -159,7 +159,7 @@ class Swift(pygame.sprite.Sprite):
     def music():
         mixer.music.load('background_music/rainbow.mp3')
         mixer.music.play(-1)
-        mixer.music.set_volume(1.5)
+        mixer.music.set_volume(1)
 
 class Quinn(pygame.sprite.Sprite):
     bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_magma.png').convert_alpha(), (screen_w, screen_h))
@@ -324,7 +324,7 @@ class shieldZombie(pygame.sprite.Sprite):
         self.image = self.full_health_image
         self.rect = self.image.get_rect()
         self.target = target
-        self.speed = random.uniform(2, 4) # Random speed between 1 and 3
+        self.speed = random.uniform(2, 3) # Random speed between 1 and 3
     
     def update(self):
         # Calculate direction towards the player
@@ -642,7 +642,7 @@ def shop(mouse):
     speed_potion = pygame.transform.scale(pygame.image.load("images/power-ups/circled_speed_potion.png").convert_alpha(), (80, 80))
     speed_potion_title = text_font.render("SPEED POTION", True, (0, 0, 0))
     speed_potion_cost = text_font.render("Cost: 200 points", True, (0, 0, 0))
-    speed_potion_feature = text_font.render("Boosts speed for 10 seconds when activated", True, (0, 0, 0))
+    speed_potion_feature = text_font.render("Boosts speed for 5 seconds when activated", True, (0, 0, 0))
 
     # Sign
     text = font.render("NOT ENOUGH POINTS", True, (0, 0, 0))
@@ -935,9 +935,9 @@ def play():
             if zombie_generation_rate < 0.5:
                 zombie_generation_rate += 0.05
             elif zombie_generation_rate < 1:
-                zombie_generation_rate += 0.02
-            else:
                 zombie_generation_rate += 0.01
+            else:
+                zombie_generation_rate += 0.005
             acc += 0.0001
 
         hits = pygame.sprite.spritecollide(player, zombies, False)
