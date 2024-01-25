@@ -11,7 +11,7 @@
 # Lines 556 - 660 Shop
 # Lines 661 - 883 Game Play Functions (top menu bar, movement, reset character stats, game over, etc.)
 # Lines 884 - 922 Bullet Shooting
-# LInes 923 - 933 Reset Game After Round
+# Lines 923 - 933 Reset Game After Round
 # Lines 934 - ### Main Loop of Game
 
 # ----------------------------------- Imports and Initialization -----------------------------------
