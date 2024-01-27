@@ -898,7 +898,7 @@ def play():
     border()
 
     if picked_character == "John":
-        if 0.8 * screen_w <= player.rect.x <= 0.9 * screen_w and 0.1 * screen_h + 83 <= player.rect.y <= 0.16 * screen_h + 83:
+        if 0.78 * screen_w <= player.rect.x <= 0.92 * screen_w and 0.1 * screen_h + 75 <= player.rect.y <= 0.16 * screen_h + 85:
             if in_well < 0:
                 in_well = time.time()
             if time.time() - in_well >= 1:
