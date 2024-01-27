@@ -19,7 +19,7 @@
 import pygame
 from pygame.locals import *
 from pygame import mixer
-import random, time, math, ctypes, sys
+import random, time, math, sys
 import pygame.gfxdraw
 
 pygame.init()
@@ -436,10 +436,10 @@ menu_music()
 def startMenu():
     global hovering_quit_b, hovering_start_b, hovering_tutorial_b
     # Images and Text
-    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))
     title_img = pygame.image.load('images/UNDEAD UPRISING.png').convert_alpha()
     text = font.render('Pick your character', True, (255, 255, 255))
     border = pygame.transform.scale(pygame.image.load('images/border.png').convert_alpha(), (700, 200))
+    bg = pygame.transform.scale(pygame.image.load('images/backgrounds/bg_earth.png').convert_alpha(), (screen_w, screen_h))   
     tutorial_b = pygame.transform.scale(pygame.image.load('images/TUTORIAL_button.png').convert_alpha(), (115, 115))
     start_b = pygame.transform.scale(pygame.image.load('images/START_button.png').convert_alpha(), (150, 60))
     quit_b = pygame.transform.scale(pygame.image.load('images/QUIT_button.png').convert_alpha(), (150, 60))
@@ -476,21 +476,6 @@ def startMenu():
 # Detects events during start menu state
 def detect_start_menu():
     global game_state, player, picked_character, hovering_quit_b, hovering_start_b, hovering_tutorial_b
-
-    if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
-        hovering_tutorial_b = True
-    else:
-        hovering_tutorial_b = False
-    
-    if screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
-        hovering_quit_b = True
-    else:
-        hovering_quit_b = False
-
-    if screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
-        hovering_start_b = True
-    else:
-        hovering_start_b = False
 
     # Detects if a button was pressed
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -564,6 +549,21 @@ def detect_start_menu():
         elif screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
             sys.exit()
 
+    if 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
+        hovering_tutorial_b = True
+    else:
+        hovering_tutorial_b = False
+    
+    if screen_w / 2 + 50 <= mouse[0] <= screen_w / 2  + 200 and screen_h - 140 <= mouse[1] < screen_h - 80:
+        hovering_quit_b = True
+    else:
+        hovering_quit_b = False
+
+    if screen_w / 2 - 200 <= mouse[0] <= screen_w / 2 - 50 and screen_h - 140 <= mouse[1] <= screen_h - 80:
+        hovering_start_b = True
+    else:
+        hovering_start_b = False
+
 # ----------------------------------- Tutorial -----------------------------------
 
 def tutorial(mouse):
@@ -581,7 +581,7 @@ def tutorial(mouse):
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 100000
+points = 0
 
 shop_items = {
     "quinn" : False,
@@ -711,12 +711,10 @@ def shop(mouse):
     screen.blit(med_kit_title, (screen_w / 2 + 150, 265))
     screen.blit(med_kit_cost, (screen_w / 2 + 150, 285))
     screen.blit(med_kit_feature, (screen_w / 2 + 150, 305))
-
-    # screen.blit(med_kit_def, (screen_w / 2 + 150, 255))
-
     screen.blit(speed_potion_title, (screen_w / 2 + 150, 365))
     screen.blit(speed_potion_cost, (screen_w / 2 + 150, 385))
     screen.blit(speed_potion_feature, (screen_w / 2 + 150, 405))
+
     screen.blit(buy_button, (500, screen_h - 150))
     screen.blit(back_button, (screen_w - 600, screen_h - 150))
 
