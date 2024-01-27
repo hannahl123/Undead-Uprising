@@ -581,7 +581,7 @@ def tutorial(mouse):
 
 # ----------------------------------- Shop -----------------------------------
 
-points = 0
+points = 2000
 
 shop_items = {
     "quinn" : False,
@@ -897,7 +897,7 @@ def play():
     global player, charX, charY, charX_change, charY_change, game_state, clock, points, last_zombie_time, screen, zombie_generation_rate, player_health_decrease_timer, zombies_allowed, acc, in_well, well_death, normalCount
     border()
 
-    if picked_character == "John" or picked_character == "Tony":
+    if picked_character == "John":
         if 0.8 * screen_w <= player.rect.x <= 0.9 * screen_w and 0.1 * screen_h + 83 <= player.rect.y <= 0.16 * screen_h + 83:
             if in_well < 0:
                 in_well = time.time()
