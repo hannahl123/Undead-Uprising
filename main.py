@@ -956,9 +956,7 @@ def play():
 
 def game_over():
     global well_death, all_sprites, player
-    all_sprites.empty()
-    zombies.empty()
-    bullets.empty()
+    resetGame()
 
     # Images
     game_over_screen = pygame.transform.scale(pygame.image.load("images/game_over_screen.png").convert_alpha(), (screen_w, screen_h))
