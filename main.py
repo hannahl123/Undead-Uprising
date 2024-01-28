@@ -541,7 +541,7 @@ def detect_start_menu():
             # if the start button was pressed, set the game state to game_play, which executes the next part of the game
             game_state = "bg_story"
         
-        # Changes game state to tutorial if  tutorial button is clicked
+        # Changes game state to tutorial if tutorial button is clicked
         elif 30 <= mouse[0] <= 105 and screen_h - 105 <= mouse[1] <= screen_h - 30:
             game_state = "tutorial"
 
@@ -624,12 +624,12 @@ def shop(mouse):
     normal_theresa = pygame.transform.scale(pygame.image.load("images/characters/normal_theresa.png").convert_alpha(), (80, 80))
     theresa_title = text_font.render("THERESA", True, (0, 0, 0))
     theresa_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
-    theresa_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
+    theresa_feature = text_font.render("Feature: Heals 1HP every 3 seconds automatically", True, (0, 0, 0))
     jekyll = pygame.transform.scale(pygame.image.load("images/characters/circle_jekyll.png").convert_alpha(), (80, 80))
     normal_jekyll = pygame.transform.scale(pygame.image.load("images/characters/normal_jekyll.png").convert_alpha(), (80, 80))
     jekyll_title = text_font.render("JEKYLL", True, (0, 0, 0))
     jekyll_cost = text_font.render("Cost: 1000 points", True, (0, 0, 0))
-    jekyll_feature = text_font.render("Feature: Higher initial health with no movement penalty", True, (0, 0, 0))
+    jekyll_feature = text_font.render("Feature: Leaves behind a poison trail that damages zombies", True, (0, 0, 0))
 
     # Power-up images and definitions
     normal_med_kit = pygame.transform.scale(pygame.image.load("images/power-ups/normal_med_kit.png").convert_alpha(), (80, 80))
@@ -901,7 +901,7 @@ def play():
         if 0.78 * screen_w <= player.rect.x <= 0.92 * screen_w and 0.1 * screen_h + 75 <= player.rect.y <= 0.16 * screen_h + 85:
             if in_well < 0:
                 in_well = time.time()
-            if time.time() - in_well >= 1:
+            if time.time() - in_well >= 3:
                 well_death = True
                 player.health = 0
                 in_well = -1
